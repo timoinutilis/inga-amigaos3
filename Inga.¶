@@ -1,0 +1,465 @@
+Storm Shell Project (0018)
+Settings (Start)
+C/C++ Environment
+"StormC:include"
+0
+Includepath (End)
+0 "" 80
+1 "objects"
+1 0 "makelog.txt"
+""
+0
+0 0
+0
+0 1
+C/C++ Preprozessor
+1 "NDEBUG" ""
+0
+Defines (End)
+1 1 1
+0 0
+C/C++ Options
+0 0 0 2 1 0 0 0 0 1 0 1 0 0 0
+0 0 0
+0
+0 1 0
+C/C++ Optimizer
+9
+C/C++ Warnings
+1 1 1 1 1 1 0 1
+0 0
+GCC Options (1)
+Defines (End)
+1 0 0 1 0
+1 0 0 1 1 1 0
+0 2 1 0 0
+0 0 0 0 1 0 0
+0 0 0 0
+0 ""
+2 0 0 0
+1 0 0 1 0 1 0 1 0 1
+1 1 0 1 0 1
+0 1 1 1 1 0 0
+1 0 0 0 0
+Assembler
+0 ""
+0 "CON://640/200/Storm Assembler/AUTO/WAIT/SCREEN StormScreen"
+0 0
+0 1 60 0 1 0 0 20 0
+Sets (End)
+0 1 0 0 0 2 1 0 0
+1 1 1 1 0 0 0 0 0
+1 0
+0 0 0 0 0
+Linker
+0 0 "PROGDIR:startup.o" 0 0 1 0 0 0 0
+"StormC:lib/" 0 "StormC:lib/logfile" 0 1 1
+0 "_WizardSurface"
+0 0 50 0 50 0 50 0 0
+0 0 0 0 0 0 0 0
+Run
+30 "" "" "" 0
+""
+
+1 "CON://400/500/Storm Console/AUTO/WAIT/SCREEN StormScreen" "RAM:Output" "RAM:Input"
+1 0
+0 0 0 "" ""
+Settings (End)
+Storm Shell Project (Custom Sections End)
+Section
+1 1 100
+0 1 1 0
+4
+File
+1 "kernel.c"
+"kernel.c"
+"strukturen.h"
+"kernel.h"
+"grafik.h"
+"animation.h"
+"Textausgabe.h"
+"elem_felder.h"
+"elem_zierden.h"
+"elem_objekte.h"
+"elem_personen.h"
+"vp.h"
+"inventar.h"
+"dialog.h"
+"ingasound.h"
+"ingaplayer.h"
+"ingaaudiocd.h"
+"menu.h"
+"cache.h"
+Storm Shell Project (Dependencies)
+"objects/kernel.o" "objects/kernel.debug"
+""
+1 1
+File
+1 "grafik.c"
+"grafik.c"
+"strukturen.h"
+"grafik.h"
+"cache.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/grafik.o" "objects/grafik.debug"
+""
+1 1
+File
+1 "animation.c"
+"animation.c"
+"strukturen.h"
+"animation.h"
+"grafik.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/animation.o" "objects/animation.debug"
+""
+1 1
+File
+1 "Textausgabe.c"
+"Textausgabe.c"
+"strukturen.h"
+"Textausgabe.h"
+Storm Shell Project (Dependencies)
+"objects/Textausgabe.o" "objects/Textausgabe.debug"
+""
+1 1
+File
+1 "elem_felder.c"
+"elem_felder.c"
+"strukturen.h"
+"elem_felder.h"
+"vp.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/elem_felder.o" "objects/elem_felder.debug"
+""
+1 1
+File
+1 "elem_zierden.c"
+"elem_zierden.c"
+"strukturen.h"
+"elem_zierden.h"
+"animation.h"
+"grafik.h"
+"vp.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/elem_zierden.o" "objects/elem_zierden.debug"
+""
+1 1
+File
+1 "elem_objekte.c"
+"elem_objekte.c"
+"strukturen.h"
+"elem_objekte.h"
+"animation.h"
+"grafik.h"
+"vp.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/elem_objekte.o" "objects/elem_objekte.debug"
+""
+1 1
+File
+1 "elem_personen.c"
+"elem_personen.c"
+"strukturen.h"
+"elem_personen.h"
+"elem_objekte.h"
+"animation.h"
+"textausgabe.h"
+"vp.h"
+"cache.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/elem_personen.o" "objects/elem_personen.debug"
+""
+1 1
+File
+1 "vp.c"
+"vp.c"
+"strukturen.h"
+"vp.h"
+"elem_felder.h"
+"elem_zierden.h"
+"elem_objekte.h"
+"elem_personen.h"
+"grafik.h"
+"inventar.h"
+"dialog.h"
+"textausgabe.h"
+"ingasound.h"
+"ingaplayer.h"
+"ingaaudiocd.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/vp.o" "objects/vp.debug"
+""
+1 1
+File
+1 "inventar.c"
+"inventar.c"
+"strukturen.h"
+"inventar.h"
+"kernel.h"
+"grafik.h"
+"animation.h"
+Storm Shell Project (Dependencies)
+"objects/inventar.o" "objects/inventar.debug"
+""
+1 1
+File
+1 "dialog.c"
+"dialog.c"
+"strukturen.h"
+"dialog.h"
+"Textausgabe.h"
+"grafik.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/dialog.o" "objects/dialog.debug"
+""
+1 1
+File
+1 "sequenzen.c"
+"sequenzen.c"
+"strukturen.h"
+"grafik.h"
+"Textausgabe.h"
+"ingasound.h"
+"kernel.h"
+"cache.h"
+"ingaaudiocd.h"
+Storm Shell Project (Dependencies)
+"objects/sequenzen.o" "objects/sequenzen.debug"
+""
+1 1
+File
+1 "menu.c"
+"menu.c"
+"strukturen.h"
+"menu.h"
+"grafik.h"
+"animation.h"
+"textausgabe.h"
+"elem_felder.h"
+"elem_zierden.h"
+"elem_objekte.h"
+"elem_personen.h"
+"vp.h"
+"inventar.h"
+"kernel.h"
+"ingaaudiocd.h"
+"ingasound.h"
+Storm Shell Project (Dependencies)
+"objects/menu.o" "objects/menu.debug"
+""
+1 1
+File
+1 "cache.c"
+"cache.c"
+"strukturen.h"
+"cache.h"
+Storm Shell Project (Dependencies)
+"objects/cache.o" "objects/cache.debug"
+""
+1 1
+File
+1 "ingasound.c"
+"ingasound.c"
+"strukturen.h"
+"ingasound.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/ingasound.o" "objects/ingasound.debug"
+""
+1 1
+File
+1 "ingaplayer.c"
+"ingaplayer.c"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"objects/ingaplayer.o" "objects/ingaplayer.debug"
+""
+1 1
+File
+1 "ingaaudiocd.c"
+"ingaaudiocd.c"
+"kernel.h"
+"device_info.h"
+Storm Shell Project (Dependencies)
+"objects/ingaaudiocd.o" "objects/ingaaudiocd.debug"
+""
+1 1
+File
+1 "device_info.c"
+"device_info.c"
+"device_info.h"
+Storm Shell Project (Dependencies)
+"objects/device_info.o" "objects/device_info.debug"
+""
+1 1
+Section
+2 1 95
+0 1 1 0
+2
+File
+2 "strukturen.h"
+"strukturen.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "grafik.h"
+"grafik.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "animation.h"
+"animation.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "Textausgabe.h"
+"Textausgabe.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "elem_felder.h"
+"elem_felder.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "elem_zierden.h"
+"elem_zierden.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "elem_objekte.h"
+"elem_objekte.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "elem_personen.h"
+"elem_personen.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "vp.h"
+"vp.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "kernel.h"
+"kernel.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "inventar.h"
+"inventar.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "dialog.h"
+"dialog.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "ingasound.h"
+"plugins.h"
+"ingasound.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "menu.h"
+"menu.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "cache.h"
+"cache.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "ingaplayer.h"
+"ingaplayer.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "ingaaudiocd.h"
+"ingaaudiocd.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+2 "device_info.h"
+"device_info.h"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Section
+10 1 40
+0 0 0 0
+7
+File
+10 "Eigenes:Ermentrud/Ermentrud"
+"Eigenes:Ermentrud-Real/Ermentrud"
+"Eigenes:Ermentrud/Ermentrud"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Section
+5 0 -50
+0 0 0 0
+7
+File
+5 "storm.lib"
+"storm.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "amiga.lib"
+"amiga.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+Storm Shell Project (End)
