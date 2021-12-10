@@ -136,7 +136,7 @@ void main() {
 	LONG freq=22050, f;
 	ULONG typ=AHIST_M16S;
 	BYTE faktor=1;
-	UWORD offset=46;
+	UWORD offset=54;
 
 	if (port=CreatePort("IngaSoundPort", 40)) {
 		// Sample-Format aus der Datei "Sound.config" erfahren
@@ -239,6 +239,7 @@ void main() {
 
 								strcpy(dat, "Sounds/");
 								strcat(dat, smsg->file);
+								strcat(dat, ".aiff");
 								if (file=Open(dat, MODE_OLDFILE)) {
 									Seek(file, 0, OFFSET_END);
 									len=Seek(file, offset, OFFSET_BEGINNING)-offset;

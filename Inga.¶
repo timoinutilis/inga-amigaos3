@@ -437,15 +437,13 @@ Section
 0 0 0 0
 7
 File
-10 "Eigenes:Ermentrud/Ermentrud"
-"Eigenes:Ermentrud-Real/Ermentrud"
-"Eigenes:Ermentrud/Ermentrud"
+10 "Games:Ermentrud/Ermentrud"
 Storm Shell Project (Dependencies)
 "" ""
 ""
 0 0
 Section
-5 0 -50
+5 1 -50
 0 0 0 0
 7
 File
@@ -458,6 +456,13 @@ Storm Shell Project (Dependencies)
 File
 5 "amiga.lib"
 "amiga.lib"
+Storm Shell Project (Dependencies)
+"" ""
+""
+0 0
+File
+5 "cdplayer.lib"
+"cdplayer.lib"
 Storm Shell Project (Dependencies)
 "" ""
 ""

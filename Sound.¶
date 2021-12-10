@@ -82,8 +82,7 @@ Section
 0 0 0 0
 7
 File
-10 "Eigenes:IngaErmDemo/IngaSound"
-"Eigenes:IngaErmDemo/IngaSound"
+10 "Games:Ermentrud/IngaSound"
 Storm Shell Project (Dependencies)
 "" ""
 ""
