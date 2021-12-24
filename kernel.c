@@ -59,6 +59,7 @@ struct Window *fenster = NULL;
 struct Screen *schirm = NULL;
 struct ScreenBuffer *sbuf[2] = {NULL, NULL};
 struct MsgPort *sbport[2] = {NULL, NULL};
+struct RastPort sbrp[2];
 BPTR assignlock = NULL;
 APTR font = NULL;
 BPTR gamedirlock = NULL;
@@ -74,7 +75,7 @@ BOOL MausSichtbar = TRUE;
 UBYTE Taste = 0;
 
 //Programmsystemvariablen
-char *ver = "$VER: Inga-Engine Version 1.13";
+char *ver = "$VER: Inga-Engine Version 1.14";
 char prgname[257] = {0};
 extern char cddrive[10];
 extern char speicherpfad[300];
@@ -88,6 +89,7 @@ UWORD iannumgehen = 2;
 UBYTE modus = 0; // 0: Nur Skriptbearbeitung.  1: Skriptbearbeitung mit Bild.  2: Bild und Benutzung.
 BOOL devmodus = FALSE;
 extern ULONG minfree;
+extern UBYTE sbnum;
 
 //VP-Variablen
 BOOL escsprung = FALSE;
@@ -406,12 +408,14 @@ void Start() {
 		SA_DisplayID, disid,
 		SA_Type, CUSTOMSCREEN,
 		SA_Draggable, FALSE,
+		SA_ShowTitle, FALSE,
 		SA_Colors32, rgb32,
 		TAG_DONE))) Fehler(4, "Bildschirm");
 
 	if (!(fenster = OpenWindowTags(NULL,
 		WA_Width, 640,
 		WA_Height, 480,
+		WA_Backdrop, TRUE,
 		WA_Borderless, TRUE,
 		WA_CustomScreen, schirm,
 		WA_Flags, WFLG_REPORTMOUSE | WFLG_RMBTRAP | WFLG_ACTIVATE,
@@ -421,10 +425,13 @@ void Start() {
 	sbuf[0] = AllocScreenBuffer(schirm, NULL, SB_SCREEN_BITMAP);
 	sbuf[1] = AllocScreenBuffer(schirm, NULL, SB_COPY_BITMAP);
 	if (sbuf[0] && sbuf[1]) {
-		fenster->RPort->BitMap = sbuf[1]->sb_BitMap;
+		InitRastPort(&sbrp[0]);
+		InitRastPort(&sbrp[1]);
+		sbrp[0].BitMap = sbuf[0]->sb_BitMap;
+		sbrp[1].BitMap = sbuf[1]->sb_BitMap;
 		sbport[0] = CreateMsgPort(); sbuf[0]->sb_DBufInfo->dbi_SafeMessage.mn_ReplyPort = sbport[0];
 		sbport[1] = CreateMsgPort(); sbuf[1]->sb_DBufInfo->dbi_SafeMessage.mn_ReplyPort = sbport[1];
-		if (!sbport[0] && !sbport[1]) Fehler(4, "Bildpuffer-Ports");
+		if (!sbport[0] || !sbport[1]) Fehler(4, "Bildpuffer-Ports");
 	} else Fehler(4, "Bildpuffer");
 
 	if (assignlock = Lock("Fonts/", ACCESS_READ)) {
@@ -432,7 +439,8 @@ void Start() {
 	}
 
 	if (font = OpenDiskFont(&textattr)) {
-		SetFont(fenster->RPort, font);
+		SetFont(&sbrp[0], font);
+		SetFont(&sbrp[1], font);
 	} else Fehler(4, "Inga.font");
 
 	// Merkmale des Piktogramms...
@@ -498,12 +506,11 @@ void Ende() {
 	EntleereCache();
 	EntferneMause();
 	if (assignlock) RemAssignList("FONTS", assignlock);
-	if (sbport[0]) DeleteMsgPort(sbport[0]);
-	if (sbport[1]) DeleteMsgPort(sbport[1]);
-	if (fenster && sbuf[0]) fenster->RPort->BitMap = sbuf[0]->sb_BitMap;
+	if (fenster) CloseWindow(fenster);
 	if (sbuf[0]) FreeScreenBuffer(schirm, sbuf[0]);
 	if (sbuf[1]) FreeScreenBuffer(schirm, sbuf[1]);
-	if (fenster) CloseWindow(fenster);
+	if (sbport[0]) DeleteMsgPort(sbport[0]);
+	if (sbport[1]) DeleteMsgPort(sbport[1]);
 	if (schirm) CloseScreen(schirm);
 	if (font) CloseFont(font);
 	if (gamedirlock) UnLock(gamedirlock);
@@ -590,12 +597,12 @@ void hauptteil() {
 		/*====Bild====*/
 		if (modus > 0) {
 			MausTastaturStatus();
-			BltBitMapRastPort(ort.ibm->bild, 1, 1, fenster->RPort, 1, 1, escibm->breite, escibm->hoehe, 192);
+			BltBitMapRastPort(ort.ibm->bild, 1, 1, &sbrp[sbnum], 1, 1, escibm->breite, escibm->hoehe, 192);
 			BltBezeichnungWeg();
 			BltAktInvWeg();
 			BltPersonenWeg();
 			Restauration();
-			aktbez[0] = 0;; aktid = 0;
+			aktbez[0] = 0; aktid = 0;
 			BltZierden();
 			BltTesteObjekte();
 			TesteFelder();
@@ -610,7 +617,7 @@ void hauptteil() {
 			Bezeichne(MausX, MausY, aktbez);
 			if (dialog.aktiv) ZeigeTesteDialog();
 			MeldeAusgabe();
-			if (escptr > 0) BltMaskBitMapRastPort(escibm->bild, 0, 0, fenster->RPort, 1, 1, escibm->breite, escibm->hoehe, 192, escibm->maske->Planes[0]);
+			if (escptr > 0) BltMaskBitMapRastPort(escibm->bild, 0, 0, &sbrp[sbnum], 1, 1, escibm->breite, escibm->hoehe, 224, escibm->maske->Planes[0]);
 			TesteAudioCD();
 
 			if (sprech.pers >= 0) {

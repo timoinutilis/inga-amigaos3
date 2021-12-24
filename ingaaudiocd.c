@@ -20,7 +20,7 @@ BYTE CDReadTOC(struct CD_TOC *, struct IOStdReq *);
 
 //Systemzeiger
 struct Library *CDPlayerBase = NULL;
-struct MsgPort	*cdport = NULL;
+struct MsgPort *cdport = NULL;
 struct IOStdReq *cdreq = NULL;
 BYTE cderr = -1;
 

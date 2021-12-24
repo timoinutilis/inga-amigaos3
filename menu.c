@@ -31,6 +31,7 @@
 extern struct Screen *schirm;
 extern struct Window *fenster;
 extern struct ScreenBuffer *sbuf[2];
+extern struct RastPort sbrp[2];
 
 //Maus
 extern WORD MausX;
@@ -44,6 +45,7 @@ extern UBYTE modus;
 extern BOOL devmodus;
 char speicherpfad[300] = "";
 extern char hauptipe[31];
+extern UBYTE sbnum;
 
 //VP-Variablen
 extern ULONG ingaptr;
@@ -83,13 +85,13 @@ void Prozess(UWORD num, UWORD von) {
 	if (num > von) num = von;
 
 	if (!menu.prozessleer->maske)
-		BltBitMapRastPort(menu.prozessleer->bild, 0, 0, fenster->RPort, x, y, br, ho, 192);
-	else BltMaskBitMapRastPort(menu.prozessleer->bild, 0, 0, fenster->RPort, x, y, br, ho, 192, menu.prozessleer->maske->Planes[0]);
+		BltBitMapRastPort(menu.prozessleer->bild, 0, 0, &sbrp[sbnum], x, y, br, ho, 192);
+	else BltMaskBitMapRastPort(menu.prozessleer->bild, 0, 0, &sbrp[sbnum], x, y, br, ho, 224, menu.prozessleer->maske->Planes[0]);
 
 	if (num > 0) {
 		if (!menu.prozessvoll->maske)
-			BltBitMapRastPort(menu.prozessvoll->bild, 0, 0, fenster->RPort, x, y, br * num / von, ho, 192);
-		else BltMaskBitMapRastPort(menu.prozessvoll->bild, 0, 0, fenster->RPort, x, y, br * num / von, ho, 192, menu.prozessvoll->maske->Planes[0]);
+			BltBitMapRastPort(menu.prozessvoll->bild, 0, 0, &sbrp[sbnum], x, y, br * num / von, ho, 192);
+		else BltMaskBitMapRastPort(menu.prozessvoll->bild, 0, 0, &sbrp[sbnum], x, y, br * num / von, ho, 224, menu.prozessvoll->maske->Planes[0]);
 	}
 }
 
@@ -217,8 +219,8 @@ void TesteBltPunkte() {
 	mitteb = menu.punkt->hoehe >> 1;
 	aktpunkt = -1;
 	
-	BltBitMapRastPort(menu.bild->bild, 220, 100, fenster->RPort, 220, 100, menu.punkt->breite, 380, 192);
-	Schreibe(320 - (TextLength(fenster->RPort, punktname[0], strlen(punktname[0])) >> 1), 100 - mittet, 255, punktname[0]);
+	BltBitMapRastPort(menu.bild->bild, 220, 100, &sbrp[sbnum], 220, 100, menu.punkt->breite, 380, 192);
+	Schreibe(320 - (TextLength(&sbrp[sbnum], punktname[0], strlen(punktname[0])) >> 1), 100 - mittet, 255, punktname[0]);
 	SchreibeOR(10, 460, 255, &ver[6]);
 
 	do {
@@ -265,10 +267,10 @@ void Eingabe(UBYTE slot) {
 	ModifyIDCMP(fenster, IDCMP_MOUSEBUTTONS | IDCMP_VANILLAKEY);
 
 	do {
-		BltBitMapRastPort(menu.bild->bild, 220, 80 + (slot * 40), fenster->RPort, 220, 80 + (slot * 40), 420, 40, 192);
+		BltBitMapRastPort(menu.bild->bild, 220, 80 + (slot * 40), &sbrp[sbnum], 220, 80 + (slot * 40), 420, 40, 192);
 		BltIANFrame(menu.punkt, frame, 220, 100 - mitteb + (slot * 40), FALSE);
 		Schreibe(260, 100 - mittet + (slot * 40), 255, name);
-		if (blink < 5) Schreibe(260 + TextLength(fenster->RPort, name, len), 100 - mittet + (slot * 40), 255, "_");
+		if (blink < 5) Schreibe(260 + TextLength(&sbrp[sbnum], name, len), 100 - mittet + (slot * 40), 255, "_");
 		BildWechsel();
 
 		if (pausez >= menu.punkt->ppf) {
@@ -290,7 +292,7 @@ void Eingabe(UBYTE slot) {
 				}
 				if (mes->Code > 30) {
 					//Zeichen anhängen.
-					if (TextLength(fenster->RPort, name, len) < 360) {
+					if (TextLength(&sbrp[sbnum], name, len) < 360) {
 						for (z = 0; z < 60; z++) {
 							if (name[z] == 0) {
 								name[z] = mes->Code;

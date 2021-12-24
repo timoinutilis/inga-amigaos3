@@ -15,7 +15,7 @@
 #include "animation.h"
 
 //Systemzeiger
-extern struct Window *fenster;
+extern struct RastPort sbrp[2];
 
 //Maus
 extern WORD MausX;
@@ -26,6 +26,7 @@ extern BOOL RMaus;
 //Programmsystemvariablen
 extern FLOAT frame20;
 extern BOOL zmenu;
+extern UBYTE sbnum;
 
 //Datenstrukturen
 extern struct ORT ort;
@@ -63,8 +64,8 @@ void ZeigeTesteInvBar() {
 	UBYTE z;
 	BOOL weiter;
 
-	if (!invbar.ibm->maske) BltBitMapRastPort(invbar.ibm->bild, 0, 0, fenster->RPort, 0, 400, 640, 80, 192);
-	else BltMaskBitMapRastPort(invbar.ibm->bild, 0, 0, fenster->RPort, 0, 400, 640, 80, 192, invbar.ibm->maske->Planes[0]);
+	if (!invbar.ibm->maske) BltBitMapRastPort(invbar.ibm->bild, 0, 0, &sbrp[sbnum], 0, 400, 640, 80, 192);
+	else BltMaskBitMapRastPort(invbar.ibm->bild, 0, 0, &sbrp[sbnum], 0, 400, 640, 80, 224, invbar.ibm->maske->Planes[0]);
 
 	akt = invbar.erster; z = 0; weiter = FALSE;
 	while (akt && (z<8)) {
@@ -194,9 +195,11 @@ void BltAktInv(WORD x, WORD y) {
 }
 
 void BltAktInvWeg() {
+	UWORD breite;
 	UWORD hohe;
-	if (inv.alty >= 0) {
+	if (inv.altx >= 0 && inv.alty >= 0) {
+		if (inv.altx <= 592) breite = 48; else breite = 640 - inv.altx;
 		if (inv.alty <= 432) hohe = 48; else hohe = 480 - inv.alty;
-		BltBitMapRastPort(ort.ibm->bild, inv.altx, inv.alty, fenster->RPort, inv.altx, inv.alty, 48, hohe, 192);
+		BltBitMapRastPort(ort.ibm->bild, inv.altx, inv.alty, &sbrp[sbnum], inv.altx, inv.alty, breite, hohe, 192);
 	}
 }

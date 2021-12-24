@@ -9,6 +9,7 @@
 
 #include <exec/exec.h>
 #include <dos/dos.h>
+#include <dos/dostags.h>
 #include <workbench/icon.h>
 
 #include "strukturen.h"
@@ -31,8 +32,11 @@ void StarteIngaSound() {
 	
 	if (file = Open("IngaSound", MODE_OLDFILE)) {
 		Close(file);
-		
-		Execute("run >NIL: IngaSound", NULL, NULL);
+
+		SystemTags("IngaSound",
+			SYS_Asynch, TRUE,
+			NP_StackSize, 8192,
+			TAG_DONE);
 
 		Forbid();
 		for (z = 0; z < 6; z++) {

@@ -23,10 +23,12 @@
 #include "kernel.h"
 
 //Systemzeiger
-extern struct Window *fenster;
+extern struct Screen *schirm;
+extern struct RastPort sbrp[2];
 
 //Programmsystemvariablen
 extern struct timeval systime;
+extern UBYTE sbnum;
 
 //Maus / Tastatur
 extern BOOL LMaus;
@@ -63,32 +65,32 @@ void Sequenz(STRPTR datei) {
 				if (*z == 0x0A) *z = 0;
 			}
 			
-			while(!(bitmap = AllocBitMap(640, 480, 8, BMF_MINPLANES | BMF_SPECIALFMT, fenster->RPort->BitMap))) {
+			while(!(bitmap = AllocBitMap(640, 480, 8, BMF_MINPLANES | BMF_SPECIALFMT, schirm->RastPort.BitMap))) {
 				if (!CacheAufraumen()) break;
 			}
 			
-			txheight = fenster->RPort->TxHeight;
+			txheight = sbrp[sbnum].TxHeight;
 			z = mem;
 			MausStatusSichtbar(FALSE);
 			do {
 				if (z[0] == '$') {
 					if (zanz > 0) {
 						BildWechsel();
-						if (bitmap) BltBitMapRastPort(bitmap, 0, 0, fenster->RPort, 0, 0, 640, 480, 192);
+						if (bitmap) BltBitMapRastPort(bitmap, 0, 0, &sbrp[sbnum], 0, 0, 640, 480, 192);
 						if (art == 0) {
 							scrolly = (FLOAT)(ttiefe - txheight);
 							GetSysTime(&alttime); abstand = 0;
 							do {
-								if (bitmap) BltBitMapRastPort(bitmap, 0, thoehe + txheight, fenster->RPort, 0, thoehe + txheight, 640, (WORD)abstand << 1, 192);
+								if (bitmap) BltBitMapRastPort(bitmap, 0, thoehe + txheight, &sbrp[sbnum], 0, thoehe + txheight, 640, (WORD)abstand << 1, 192);
 								for (i = 0; i < zanz; i++) {
 									zscrolly = (UWORD)scrolly + (i * (txheight + 3));
 									if ((zscrolly < (ttiefe - txheight)) && (zscrolly > (thoehe - 2))) {
-										tlen = TextLength(fenster->RPort, zeile[i], strlen(zeile[i])) + 3;
+										tlen = TextLength(&sbrp[sbnum], zeile[i], strlen(zeile[i])) + 3;
 										if (bitmap && (zscrolly + (WORD)abstand + txheight + 4 + ((WORD)abstand << 1) < 480)) {
 											switch (bund) {
-												case 0: BltBitMapRastPort(bitmap, 10, zscrolly, fenster->RPort, 10, zscrolly, tlen, txheight + 4 + ((WORD)abstand << 1), 192); break;
-												case 1: BltBitMapRastPort(bitmap, 320 - (tlen >> 1), zscrolly, fenster->RPort, 320 - (tlen >> 1), zscrolly, tlen, txheight + 4 + ((WORD)abstand << 1), 192); break;
-												case 2: BltBitMapRastPort(bitmap, 630 - tlen, zscrolly, fenster->RPort, 630 - tlen, zscrolly, tlen, txheight + 4 + ((WORD)abstand << 1), 192); break;
+												case 0: BltBitMapRastPort(bitmap, 10, zscrolly, &sbrp[sbnum], 10, zscrolly, tlen, txheight + 4 + ((WORD)abstand << 1), 192); break;
+												case 1: BltBitMapRastPort(bitmap, 320 - (tlen >> 1), zscrolly, &sbrp[sbnum], 320 - (tlen >> 1), zscrolly, tlen, txheight + 4 + ((WORD)abstand << 1), 192); break;
+												case 2: BltBitMapRastPort(bitmap, 630 - tlen, zscrolly, &sbrp[sbnum], 630 - tlen, zscrolly, tlen, txheight + 4 + ((WORD)abstand << 1), 192); break;
 											}
 										}
 										if (zscrolly > thoehe) {
@@ -101,8 +103,8 @@ void Sequenz(STRPTR datei) {
 									}
 								}
 								if (bitmap) {
-									BltBitMapRastPort(bitmap, 0, thoehe, fenster->RPort, 0, thoehe, 640, txheight, 192);
-									BltBitMapRastPort(bitmap, 0, ttiefe - txheight, fenster->RPort, 0, ttiefe - txheight, 640, txheight, 192);
+									BltBitMapRastPort(bitmap, 0, thoehe, &sbrp[sbnum], 0, thoehe, 640, txheight, 192);
+									BltBitMapRastPort(bitmap, 0, ttiefe - txheight, &sbrp[sbnum], 0, ttiefe - txheight, 640, txheight, 192);
 								}
 								BildWechsel();
 								
@@ -122,16 +124,16 @@ void Sequenz(STRPTR datei) {
 						}
 						if (art > 0) {
 							if (art == 1) zscrolly = 10;
-							if (art == 2) zscrolly = 240 - ((zanz * (fenster->RPort->TxHeight + 3)) >> 1);
-							if (art == 3) zscrolly = 470 - (zanz * (fenster->RPort->TxHeight + 3));
+							if (art == 2) zscrolly = 240 - ((zanz * (sbrp[sbnum].TxHeight + 3)) >> 1);
+							if (art == 3) zscrolly = 470 - (zanz * (sbrp[sbnum].TxHeight + 3));
 							for (i = 0; i < zanz; i++) {
-								tlen = TextLength(fenster->RPort, zeile[i], strlen(zeile[i])) + 3;
+								tlen = TextLength(&sbrp[sbnum], zeile[i], strlen(zeile[i])) + 3;
 								switch (bund) {
 									case 0: SchreibeOR(10, zscrolly, farbe, zeile[i]); break;
 									case 1: SchreibeOR(320 - (tlen >> 1), zscrolly, farbe, zeile[i]); break;
 									case 2: SchreibeOR(630 - tlen, zscrolly, farbe, zeile[i]); break;
 								}						
-								zscrolly = zscrolly + fenster->RPort->TxHeight + 3;
+								zscrolly = zscrolly + sbrp[sbnum].TxHeight + 3;
 							}
 							BildWechsel();
 						}
@@ -143,7 +145,7 @@ void Sequenz(STRPTR datei) {
 							ibm = LadeIBM(&z[2], MASKE_KEINE);
 							ZeigeBild(ibm); EntferneIBMIMP(ibm);
 							FadeIn(fadein);
-							if (bitmap) BltBitMap(fenster->RPort->BitMap, 0, 0, bitmap, 0, 0, 640, 480, 192, 0xFF, NULL);
+							if (bitmap) BltBitMap(sbrp[sbnum].BitMap, 0, 0, bitmap, 0, 0, 640, 480, 192, 0xFF, NULL);
 						}
 						if (z[1] == '!') SndSage(&z[2], 320);
 						if (z[1] == 'W') {

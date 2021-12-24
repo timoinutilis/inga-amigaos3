@@ -13,7 +13,7 @@
 #include "kernel.h"
 
 //Systemzeiger
-extern struct Window *fenster;
+extern struct RastPort sbrp[2];
 
 //Maus
 extern WORD MausX;
@@ -21,6 +21,7 @@ extern WORD MausY;
 
 //Programmsystemvariablen
 extern UBYTE sysfar[6];
+extern UBYTE sbnum;
 
 //Elementzeiger
 struct ANTWORT *rootantwort = NULL;
@@ -67,15 +68,15 @@ void ZeigeTesteDialog() {
 	UBYTE far;
 	struct ANTWORT *akt;
 	
-	y = 470 - (dialog.anz * (fenster->RPort->TxHeight + 3));
+	y = 470 - (dialog.anz * (sbrp[sbnum].TxHeight + 3));
 	akt = rootantwort;
 	while (akt) {
-		len = TextLength(fenster->RPort, akt->text, strlen(akt->text)) + 3;
-		if ((MausY >= y) && (MausY <= y + fenster->RPort->TxHeight) && (MausX >= 320 - (len >> 1)) && (MausX <= 320 + (len >> 1))) {
+		len = TextLength(&sbrp[sbnum], akt->text, strlen(akt->text)) + 3;
+		if ((MausY >= y) && (MausY <= y + sbrp[sbnum].TxHeight) && (MausX >= 320 - (len >> 1)) && (MausX <= 320 + (len >> 1))) {
 			far = sysfar[5]; akttyp = 5; aktid = akt->aid;
 		} else far = sysfar[4];
 		Schreibe(320 - (len >> 1), y, far, akt->text);
-		y = y + fenster->RPort->TxHeight + 3;
+		y = y + sbrp[sbnum].TxHeight + 3;
 		akt = akt->next;
 	}
 }
@@ -87,10 +88,10 @@ void DialogWeg() {
 
 	dialog.aktiv = FALSE;
 
-	y = 470 - (dialog.anz * (fenster->RPort->TxHeight + 3));
+	y = 470 - (dialog.anz * (sbrp[sbnum].TxHeight + 3));
 	akt = rootantwort;
 	while (akt) {
-		len = TextLength(fenster->RPort, akt->text, strlen(akt->text)) + 3;
+		len = TextLength(&sbrp[sbnum], akt->text, strlen(akt->text)) + 3;
 		if (len > maxlen) maxlen = len;
 		akt = akt->next;
 	}

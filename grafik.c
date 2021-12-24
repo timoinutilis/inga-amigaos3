@@ -20,10 +20,10 @@
 #include "kernel.h"
 
 //Systemzeiger
-extern struct Window *fenster;
 extern struct Screen *schirm;
-extern struct ScreenBuffer *sbuf[2] = {NULL, NULL};
-extern struct MsgPort *sbport[2] = {NULL, NULL};
+extern struct ScreenBuffer *sbuf[2];
+extern struct MsgPort *sbport[2];
+extern struct RastPort sbrp[2];
 struct Message *sbmsg = NULL;
 
 //Datenstrukturen
@@ -85,6 +85,8 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 	struct BitMap *bitmap = NULL;
 	void *rec = NULL;
 	struct RastPort rp;
+	UWORD x, y, b, m;
+	UWORD *p;
 
 	strcpy(datibm, "BitMaps/"); strcat(datibm, datei); strcat(datibm, ".ibm");
 
@@ -95,6 +97,8 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 			if (ibm->flags & 1) CRead(file, &globrgb[0], 768);
 			if (ibm->flags & 2) {
 				CRead(file, &globian, sizeof(struct IAN) - 4);
+				if (globian.breite > ibm->breite) globian.breite = ibm->breite;
+				if (globian.hoehe > ibm->hoehe) globian.hoehe = ibm->hoehe;
 			} else {
 				globian.frames = 1;
 				globian.richtung = 0;
@@ -104,7 +108,7 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 				globian.greifpy = 0;
 				globian.ppf = 0;
 			}
-			while (!(bitmap = AllocBitMap(ibm->breite, ibm->hoehe, 8, BMF_MINPLANES | BMF_SPECIALFMT, fenster->RPort->BitMap))) {
+			while (!(bitmap = AllocBitMap(ibm->breite, ibm->hoehe, 8, BMF_MINPLANES | BMF_SPECIALFMT, schirm->RastPort.BitMap))) {
 				if (!CacheAufraumen()) break;
 			}
 			if (bitmap) {
@@ -117,8 +121,21 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 				if (maske == MASKE_DATEI) ibm->maske = LadeIMP(datei);
 				if (maske == MASKE_ERSTELLEN) {
 					if (ibm->maske = AllocBitMap(ibm->breite, ibm->hoehe, 1, NULL, NULL)) {
-						ExtractColor(&rp, ibm->maske, 0, 0, 0, ibm->breite, ibm->hoehe);
-						BltBitMap(ibm->maske, 0, 0, ibm->maske, 0, 0, ibm->breite, ibm->hoehe, 80, 0xff, NULL);
+						p = (UWORD *)ibm->maske->Planes[0];
+						for (y = 0; y < ibm->hoehe; y++) {
+							b = 16; m = 0;
+							for (x = 0; x < ibm->breite; x++) {
+								if (*((UBYTE *)rec + y * ibm->bpr + x)) m |= 1;
+								if (--b) {
+									m <<= 1;
+								} else {
+									*p++ = m; b = 16; m = 0;
+								}
+							}
+							if (b < 16) {
+								m <<= b - 1; *p++ = m;
+							}
+						}
 					} else Fehler(1, datibm);
 				}
 			} else Fehler(1, datibm);
@@ -139,12 +156,10 @@ void EntferneIBMIMP(struct IBM *ibm) {
 
 // Wechselt die Double-Buffer Screens
 void BildWechsel() {
-	WaitTOF(); 
 	while (!ChangeScreenBuffer(schirm, sbuf[sbnum])) WaitTOF();
 	WaitPort(sbport[sbnum]);
 	while (sbmsg = GetMsg(sbport[sbnum]));
 	if (sbnum == 0) sbnum = 1; else sbnum = 0;
-	fenster->RPort->BitMap = sbuf[sbnum]->sb_BitMap;
 }
 
 void FadeIn(UBYTE tempo) {
@@ -205,16 +220,16 @@ void ZeigeBild(struct IBM *ibm) {
 		x = 320 - (ibm->breite >> 1);
 		y = 240 - (ibm->hoehe >> 1);
 		if ((x != 0) || (y != 0)) {
-			SetAPen(fenster->RPort, 0);
-			RectFill(fenster->RPort, 0, 0, 640, 480);
+			SetAPen(&sbrp[sbnum], 0);
+			RectFill(&sbrp[sbnum], 0, 0, 640, 480);
 		}
-		BltBitMapRastPort(ibm->bild, 0, 0, fenster->RPort, x, y, ibm->breite, ibm->hoehe, 192);
+		BltBitMapRastPort(ibm->bild, 0, 0, &sbrp[sbnum], x, y, ibm->breite, ibm->hoehe, 192);
 		BildWechsel();
 		if ((x != 0) || (y != 0)) {
-			SetAPen(fenster->RPort, 0);
-			RectFill(fenster->RPort, 0, 0, 640, 480);
+			SetAPen(&sbrp[sbnum], 0);
+			RectFill(&sbrp[sbnum], 0, 0, 640, 480);
 		}
-		BltBitMapRastPort(ibm->bild, 0, 0, fenster->RPort, x, y, ibm->breite, ibm->hoehe, 192);
+		BltBitMapRastPort(ibm->bild, 0, 0, &sbrp[sbnum], x, y, ibm->breite, ibm->hoehe, 192);
 	} else printf("ZeigeBild NULL!\n");
 }
 
@@ -229,7 +244,7 @@ void LadeHintergrund(STRPTR datei) {
 
 	if (!ort.ibm) {
 		ort.ibm = malloc(sizeof(struct IBM));
-		ort.ibm->bild = AllocBitMap(640, 480, 8, BMF_MINPLANES | BMF_SPECIALFMT, fenster->RPort->BitMap);
+		ort.ibm->bild = AllocBitMap(640, 480, 8, BMF_MINPLANES | BMF_SPECIALFMT, schirm->RastPort.BitMap);
 	}
 
 	MausStatusWarte(TRUE);
@@ -272,7 +287,7 @@ void Restauration() {
 	
 	akt = rootrest; alt = NULL;
 	while (akt) {
-		BltBitMapRastPort(ort.ibm->bild, akt->x, akt->y, fenster->RPort, akt->x, akt->y, akt->b, akt->h, 192);
+		BltBitMapRastPort(ort.ibm->bild, akt->x, akt->y, &sbrp[sbnum], akt->x, akt->y, akt->b, akt->h, 192);
 		if (akt->letztes) {
 			if (alt) alt->next = akt->next; else rootrest = akt->next;
 			free(akt);

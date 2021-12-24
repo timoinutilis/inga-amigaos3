@@ -15,10 +15,10 @@
 #include "kernel.h"
 
 //Systemzeiger
-extern struct Window *fenster;
-extern struct Screen *schirm;
+extern struct RastPort sbrp[2];
 
 //Programmsystemvariablen
+extern UBYTE sbnum;
 
 //Datenstrukturen
 extern struct IAN globian;
@@ -46,6 +46,7 @@ void EntferneIAN(struct IAN *ian) {
 void BltIANFrame(struct IAN *ian, UWORD frame, WORD x, WORD y, BOOL maske) {
 	WORD desx;
 	WORD desy;
+	UWORD breite;
 	UWORD hohe;
 
 	if (ian) {
@@ -59,8 +60,16 @@ void BltIANFrame(struct IAN *ian, UWORD frame, WORD x, WORD y, BOOL maske) {
 		x = x - ian->greifpx;
 		y = y - ian->greifpy;
 
+		breite = ian->breite;
+		if (x + ian->breite > 640) {
+			breite = 640 - x;
+		} else if (x < 0) {
+			breite = breite + x;
+			desx = desx - x;
+			x = 0;
+		}
 		hohe = ian->hoehe;
-		if (y + ian->hoehe > 479) {
+		if (y + ian->hoehe > 480) {
 			hohe = 480 - y;
 		} else if (y < 0) {
 			hohe = hohe + y;
@@ -69,13 +78,13 @@ void BltIANFrame(struct IAN *ian, UWORD frame, WORD x, WORD y, BOOL maske) {
 		}
 		if (ian->ibm) {
 			if (!ian->ibm->maske) {
-				BltBitMapRastPort(ian->ibm->bild, desx, desy, fenster->RPort, x, y, ian->breite, hohe, 192);
+				BltBitMapRastPort(ian->ibm->bild, desx, desy, &sbrp[sbnum], x, y, breite, hohe, 192);
 			} else {
-				BltMaskBitMapRastPort(ian->ibm->bild, desx, desy, fenster->RPort, x, y, ian->breite, hohe, 192, ian->ibm->maske->Planes[0]);
+				BltMaskBitMapRastPort(ian->ibm->bild, desx, desy, &sbrp[sbnum], x, y, breite, hohe, 224, ian->ibm->maske->Planes[0]);
 			}
 		} else printf("BlitIANFrame ibm NULL!\n");
 		if (maske && ort.ibm->maske) {
-			BltMaskBitMapRastPort(ort.ibm->bild, x, y, fenster->RPort, x, y, ian->breite, ian->hoehe, 192, ort.ibm->maske->Planes[0]);
+			BltMaskBitMapRastPort(ort.ibm->bild, x, y, &sbrp[sbnum], x, y, breite, hohe, 224, ort.ibm->maske->Planes[0]);
 		}
 	} else printf("BlitIANFrame NULL!\n");
 }

@@ -20,8 +20,7 @@
 #include "kernel.h"
 
 //Systemzeiger
-extern struct Window *fenster;
-extern struct Screen *schirm;
+extern struct RastPort sbrp[2];
 
 //Maus
 extern WORD MausX;
@@ -32,6 +31,7 @@ extern FLOAT frame20;
 extern BOOL erreicht;
 extern BOOL hauptsichtbar;
 char hauptipe[31] = "Hauptperson";
+extern UBYTE sbnum;
 
 //Datenstrukturen
 extern struct ORT ort;
@@ -520,6 +520,7 @@ void BltPersonenWeg() {
 	struct PERSON *akt;
 	WORD gpx;
 	WORD gpy;
+	UWORD breite;
 	UWORD hohe;
 
 	akt = rootperson;
@@ -527,14 +528,21 @@ void BltPersonenWeg() {
 		gpx = akt->altx;
 		gpy = akt->alty;
 
+		breite = akt->altbreite;
+		if (gpx + akt->altbreite > 640) {
+			breite = 640 - gpx;
+		} else if (gpx < 0) {
+			breite = breite + gpx;
+			gpx = 0;
+		}
 		hohe = akt->althoehe;
-		if (gpy + akt->althoehe > 479) {
+		if (gpy + akt->althoehe > 480) {
 			hohe = 480 - gpy;
 		} else if (gpy < 0) {
 			hohe = hohe + gpy;
 			gpy = 0;
 		}
-		BltBitMapRastPort(ort.ibm->bild, gpx, gpy, fenster->RPort, gpx, gpy, akt->altbreite, hohe, 192);
+		BltBitMapRastPort(ort.ibm->bild, gpx, gpy, &sbrp[sbnum], gpx, gpy, breite, hohe, 192);
 		akt = akt->next;
 	}
 }
