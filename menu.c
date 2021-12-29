@@ -39,6 +39,7 @@ extern WORD MausY;
 extern BOOL LMaus;
 
 //Programmsystemvariablen
+extern FLOAT frame20;
 extern char *ver;
 extern UBYTE sysfar[6];
 extern UBYTE modus;
@@ -68,7 +69,7 @@ struct MENU menu = {NULL, NULL, NULL, NULL};
 char punktname[10][60];
 BYTE aktpunkt;
 UWORD frame;
-UWORD pausez;
+FLOAT pausez;
 char slotname[6][60];
 BPTR savelock = NULL;
 BPTR spiellock = NULL;
@@ -240,7 +241,7 @@ void TesteBltPunkte() {
 		if (frame >= menu.punkt->frames) frame = 1;
 		pausez = 0;
 	}
-	pausez++;
+	pausez += frame20;
 }
 
 void Eingabe(UBYTE slot) {
@@ -278,7 +279,7 @@ void Eingabe(UBYTE slot) {
 			if (frame >= menu.punkt->frames) frame = 1;
 			pausez = 0;
 		}
-		pausez++;
+		pausez += frame20;
 		
 		blink++; if (blink > 10) blink = 0;
 

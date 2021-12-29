@@ -542,7 +542,9 @@ void BltPersonenWeg() {
 			hohe = hohe + gpy;
 			gpy = 0;
 		}
-		BltBitMapRastPort(ort.ibm->bild, gpx, gpy, &sbrp[sbnum], gpx, gpy, breite, hohe, 192);
+		if (gpx < 640 && gpy < 480) {
+			BltBitMapRastPort(ort.ibm->bild, gpx, gpy, &sbrp[sbnum], gpx, gpy, breite, hohe, 192);
+		}
 		akt = akt->next;
 	}
 }

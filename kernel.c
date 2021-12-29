@@ -75,7 +75,7 @@ BOOL MausSichtbar = TRUE;
 UBYTE Taste = 0;
 
 //Programmsystemvariablen
-char *ver = "$VER: Inga-Engine Version 1.14";
+char *ver = "$VER: Inga-Engine Version 1.15";
 char prgname[257] = {0};
 extern char cddrive[10];
 extern char speicherpfad[300];
@@ -573,8 +573,7 @@ void hauptteil() {
 		/*====Framemessung====*/
 		timev.tv_secs = systime.tv_secs; timev.tv_micro = systime.tv_micro;
 		SubTime(&timev, &alttime); alttime.tv_secs = systime.tv_secs; alttime.tv_micro = systime.tv_micro;
-		timev.tv_micro = timev.tv_micro / 1000;
-		frame20 = (FLOAT)timev.tv_micro / 50;
+		frame20 = (FLOAT)timev.tv_secs * 20 + (FLOAT)timev.tv_micro / 50000;
 		// frame20 soll 1 sein, wenn 20 fps gezeigt werden.
 		// Bei z.B. 40 fps soll es 0,5 sein, und bei 10 fps gleich 2, usw.
 

@@ -76,15 +76,17 @@ void BltIANFrame(struct IAN *ian, UWORD frame, WORD x, WORD y, BOOL maske) {
 			desy = desy - y;
 			y = 0;
 		}
-		if (ian->ibm) {
-			if (!ian->ibm->maske) {
-				BltBitMapRastPort(ian->ibm->bild, desx, desy, &sbrp[sbnum], x, y, breite, hohe, 192);
-			} else {
-				BltMaskBitMapRastPort(ian->ibm->bild, desx, desy, &sbrp[sbnum], x, y, breite, hohe, 224, ian->ibm->maske->Planes[0]);
+		if (x < 640 && y < 480) {
+			if (ian->ibm) {
+				if (!ian->ibm->maske) {
+					BltBitMapRastPort(ian->ibm->bild, desx, desy, &sbrp[sbnum], x, y, breite, hohe, 192);
+				} else {
+					BltMaskBitMapRastPort(ian->ibm->bild, desx, desy, &sbrp[sbnum], x, y, breite, hohe, 224, ian->ibm->maske->Planes[0]);
+				}
+			} else printf("BlitIANFrame ibm NULL!\n");
+			if (maske && ort.ibm->maske) {
+				BltMaskBitMapRastPort(ort.ibm->bild, x, y, &sbrp[sbnum], x, y, breite, hohe, 224, ort.ibm->maske->Planes[0]);
 			}
-		} else printf("BlitIANFrame ibm NULL!\n");
-		if (maske && ort.ibm->maske) {
-			BltMaskBitMapRastPort(ort.ibm->bild, x, y, &sbrp[sbnum], x, y, breite, hohe, 224, ort.ibm->maske->Planes[0]);
 		}
 	} else printf("BlitIANFrame NULL!\n");
 }
