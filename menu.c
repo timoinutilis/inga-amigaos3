@@ -285,7 +285,7 @@ void Eingabe(UBYTE slot) {
 
 		while (mes = (struct IntuiMessage *)GetMsg(fenster->UserPort)) {
 			if (mes->Class == IDCMP_VANILLAKEY) {
-				if (mes->Code == 13) ende = TRUE;
+				if (mes->Code == 13 && len > 0) ende = TRUE;
 				if (mes->Code == 8) {
 					if (len > 0) {
 						name[len - 1] = 0; len--;
@@ -305,7 +305,7 @@ void Eingabe(UBYTE slot) {
 				}
 			}
 			if (mes->Class == IDCMP_MOUSEBUTTONS) {
-				if (mes->Code == 104) ende = TRUE;
+				if (mes->Code == 104 && len > 0) ende = TRUE;
 			}
 			ReplyMsg((struct Message *)mes);
 		}
@@ -336,7 +336,7 @@ BOOL SpielstandSpeichern(UBYTE slot) {
 		MausStatusWarte(TRUE);
 		insg = VarAnzahl() + SichtAnzahl() + InvAnzahl() + 1;
 		schritt = 21 / (FLOAT)insg;
-		TesteBltPunkte(); Prozess(0, 20); BildWechsel();
+		Prozess(0, 20); BildWechsel();
 
 		//Grunddaten sichern.
 		person = SucheIDPerson(0);

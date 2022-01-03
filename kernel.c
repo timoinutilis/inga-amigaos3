@@ -75,7 +75,7 @@ BOOL MausSichtbar = TRUE;
 UBYTE Taste = 0;
 
 //Programmsystemvariablen
-char *ver = "$VER: Inga-Engine Version 1.15";
+char *ver = "$VER: Inga-Engine Version 1.16";
 char prgname[257] = {0};
 extern char cddrive[10];
 extern char speicherpfad[300];
