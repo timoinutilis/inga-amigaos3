@@ -113,7 +113,7 @@ void InvBarWeg() {
 struct INVGEG *AddInventar(STRPTR datei, STRPTR name, UWORD id) {
 	struct INVGEG *neu;
 
-	if (neu = malloc(sizeof(INVGEG))) {
+	if ((neu = malloc(sizeof(struct INVGEG)))) {
 		neu->id = id;
 		strcpy(neu->name, name);
 		strcpy(neu->datei, datei);
@@ -123,7 +123,7 @@ struct INVGEG *AddInventar(STRPTR datei, STRPTR name, UWORD id) {
 		invbar.erster = rootgeg;
 		invbar.pos = 0;
 	} else Fehler(0, datei);
-	return(neu)
+	return(neu);
 }
 
 void EntferneInventar(UWORD id) {

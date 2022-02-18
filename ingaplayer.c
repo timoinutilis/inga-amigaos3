@@ -7,6 +7,7 @@
 #include <exec/exec.h>
 #include <libraries/medplayer.h>
 
+#include "ingaplayer.h"
 #include "kernel.h"
 
 //Systemzeiger
@@ -23,7 +24,7 @@ UBYTE modnummer;
 //---Verwaltung------
 
 void LadePlayer() {
-	if (MEDPlayerBase=OpenLibrary("medplayer.library", 6)) {
+	if ((MEDPlayerBase=OpenLibrary("medplayer.library", 6))) {
 		error = GetPlayer(0);
 	} else Meldung("Konnte medplayer.library nicht öffnen.\nMusik ist deaktiviert.");
 }
@@ -61,7 +62,7 @@ void PlSpieleModule(STRPTR datei, UBYTE num, UBYTE anfang) {
 			strcat(dat, datei);
 			strcpy(lied, datei);
 			modnummer = num;
-			if (module = LoadModule(dat)) {
+			if ((module = LoadModule(dat))) {
 				SetModnum(modnummer);
 				PlayModule(module);
 				spiele = TRUE;

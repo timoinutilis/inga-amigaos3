@@ -65,15 +65,8 @@
 #include <dos/dos.h>
 #include <dos/filehandler.h>
 
-/* Without the includes below, GCC starts to whine... */
-#include <exec/devices.h>
-#include <exec/io.h>
-#include <exec/semaphores.h>
-#include <utility/tagitem.h>
-#include <dos/exall.h>
-
-#include <clib/exec_protos.h>
-#include <clib/dos_protos.h>
+#include <proto/exec.h>
+#include <proto/dos.h>
 
 #include <string.h>
 

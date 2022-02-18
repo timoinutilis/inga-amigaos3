@@ -21,7 +21,6 @@
 #include <libraries/lowlevel.h>
 #include <devices/timer.h>
 #include <workbench/startup.h>
-#include <wbstartup.h>
 
 #include <proto/exec.h>
 #include <proto/intuition.h>
@@ -38,7 +37,7 @@
 #include "kernel.h"
 #include "grafik.h"
 #include "animation.h"
-#include "Textausgabe.h"
+#include "textausgabe.h"
 #include "elem_felder.h"
 #include "elem_zierden.h"
 #include "elem_objekte.h"
@@ -53,6 +52,10 @@
 #include "cache.h"
 
 //Systemzeiger
+struct MsgPort *trport = NULL;
+struct timerequest *trreq = NULL;
+BYTE trerr = -1;
+struct Device *TimerBase = NULL;
 struct Library *CyberGfxBase = NULL;
 struct Library *LowLevelBase = NULL;
 struct Window *fenster = NULL;
@@ -75,7 +78,7 @@ BOOL MausSichtbar = TRUE;
 UBYTE Taste = 0;
 
 //Programmsystemvariablen
-char *ver = "$VER: Inga-Engine Version 1.16";
+char *ver = "$VER: Inga-Engine Version 1.17";
 char prgname[257] = {0};
 extern char cddrive[10];
 extern char speicherpfad[300];
@@ -193,7 +196,7 @@ void StoppeReden() {
 void MausTastaturStatus() {
 	struct IntuiMessage *mes;
 
-	while (mes = (struct IntuiMessage *)GetMsg(fenster->UserPort)) {
+	while ((mes = (struct IntuiMessage *)GetMsg(fenster->UserPort))) {
 		switch (mes->Class) {
 			case IDCMP_MOUSEMOVE:
 			MausX = mes->MouseX; // X-Position der Maus
@@ -231,17 +234,17 @@ void ErschaffeMause() {
 	mausbm[2].Planes[1] = (PLANEPTR)WarteMaus2;
 	for (z = 0; z < 3; z++) {
 		maus[z] = NewObject(NULL, "pointerclass",
-			POINTERA_BitMap, &mausbm[z],
+			POINTERA_BitMap, (ULONG)&mausbm[z],
 			POINTERA_WordWidth, 2,
 			POINTERA_XResolution, POINTERXRESN_HIRES,
 			POINTERA_YResolution, POINTERYRESN_HIGHASPECT,
 			TAG_DONE);
 	}
-	SetWindowPointer(fenster, WA_Pointer, maus[0], TAG_DONE);
+	SetWindowPointer(fenster, WA_Pointer, (ULONG)maus[0], TAG_DONE);
 
-	if (keinmausbm = AllocBitMap(16, 1, 2, BMF_CLEAR, NULL)) {
+	if ((keinmausbm = AllocBitMap(16, 1, 2, BMF_CLEAR, NULL))) {
 		maus[3] = NewObject(NULL, "pointerclass",
-			POINTERA_BitMap, keinmausbm,
+			POINTERA_BitMap, (ULONG)keinmausbm,
 			TAG_DONE);
 	} else Fehler(1, "Mauspfeil");
 }
@@ -264,11 +267,11 @@ void Maus() {
 		if (MausEcke) n = MAUS_ECKE;
 		if (MausWarte) n = MAUS_WARTE;
 	} else n = MAUS_UNSICHTBAR;
-	if (maus[n]) SetWindowPointer(fenster, WA_Pointer, maus[n], TAG_DONE);
+	if (maus[n]) SetWindowPointer(fenster, WA_Pointer, (ULONG)maus[n], TAG_DONE);
 }
 
 void StandartMauszeiger() {
-	if (maus[MAUS_ZEIGER]) SetWindowPointer(fenster, WA_Pointer, maus[MAUS_ZEIGER], TAG_DONE);
+	if (maus[MAUS_ZEIGER]) SetWindowPointer(fenster, WA_Pointer, (ULONG)maus[MAUS_ZEIGER], TAG_DONE);
 }
 
 void MausStatusEcke(BOOL w) {
@@ -317,7 +320,7 @@ void EntwicklerAktion() {
 			printf("Nummer: "); gets(eingabe[0]);
 			if (eingabe[0][0] > 0) {
 				n = atol(eingabe[0]);
-				printf("Wert (%ld): ", VarWert(n)); gets(eingabe[0]);
+				printf("Wert (%d): ", VarWert(n)); gets(eingabe[0]);
 				if (eingabe[0][0] > 0) SetzeVar(n, atol(eingabe[0]));
 			}
 		break;
@@ -355,8 +358,8 @@ ULONG ScreenMode() {
 	}
 
 	if (wahl) {
-		if (req = AllocAslRequest(ASL_ScreenModeRequest, NULL)) {
-			if (AslRequestTags(req, ASLSM_TitleText, "640x480 - 8 Bit", TAG_DONE)) {
+		if ((req = AllocAslRequest(ASL_ScreenModeRequest, NULL))) {
+			if (AslRequestTags(req, ASLSM_TitleText, (ULONG)"640x480 - 8 Bit", TAG_DONE)) {
 				disid = req->sm_DisplayID;
 				sprintf(varstr, "0x%lx", disid);
 				SetVar("IngaScreenMode", varstr, -1, GVF_GLOBAL_ONLY | GVF_SAVE_VAR);
@@ -380,12 +383,21 @@ void Start() {
 	ULONG disid;
 	ULONG rgb32[770];
 	UWORD f;
-	DiskObject *info;
+	struct DiskObject *info;
 	BOOL aktivsound = FALSE;
 	BOOL aktivplayer = FALSE;
 	BOOL aktivaudiocd = FALSE;
 	STRPTR str;
 	BPTR startdirlock = NULL;
+
+	if ((trport = CreateMsgPort())) {
+		if ((trreq = (struct timerequest *)CreateIORequest(trport, sizeof(struct timerequest)))) {
+			trerr = OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest *)trreq, 0);
+		}
+	}
+	if (trerr)
+		Fehler(3, "timer");
+	TimerBase = trreq->tr_node.io_Device;
 
 	if (!(CyberGfxBase = OpenLibrary("cybergraphics.library", 0)))
 		Fehler(3, "cybergraphics");
@@ -409,7 +421,7 @@ void Start() {
 		SA_Type, CUSTOMSCREEN,
 		SA_Draggable, FALSE,
 		SA_ShowTitle, FALSE,
-		SA_Colors32, rgb32,
+		SA_Colors32, (ULONG)rgb32,
 		TAG_DONE))) Fehler(4, "Bildschirm");
 
 	if (!(fenster = OpenWindowTags(NULL,
@@ -417,7 +429,7 @@ void Start() {
 		WA_Height, 480,
 		WA_Backdrop, TRUE,
 		WA_Borderless, TRUE,
-		WA_CustomScreen, schirm,
+		WA_CustomScreen, (ULONG)schirm,
 		WA_Flags, WFLG_REPORTMOUSE | WFLG_RMBTRAP | WFLG_ACTIVATE,
 		WA_IDCMP, IDCMP_MOUSEMOVE | IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY,
 		TAG_DONE))) Fehler(4, "Fenster");
@@ -434,30 +446,30 @@ void Start() {
 		if (!sbport[0] || !sbport[1]) Fehler(4, "Bildpuffer-Ports");
 	} else Fehler(4, "Bildpuffer");
 
-	if (assignlock = Lock("Fonts/", ACCESS_READ)) {
+	if ((assignlock = Lock("Fonts/", ACCESS_READ))) {
 		AssignAdd("FONTS", assignlock);
 	}
 
-	if (font = OpenDiskFont(&textattr)) {
+	if ((font = OpenDiskFont(&textattr))) {
 		SetFont(&sbrp[0], font);
 		SetFont(&sbrp[1], font);
 	} else Fehler(4, "Inga.font");
 
 	// Merkmale des Piktogramms...
-	if (info = GetDiskObject(prgname)) {
-		if (FindToolType((STRPTR *)info->do_ToolTypes, "DEVMODE")) devmodus = TRUE;
-		if (FindToolType((STRPTR *)info->do_ToolTypes, "SOUND")) aktivsound = TRUE;
-		if (FindToolType((STRPTR *)info->do_ToolTypes, "PLAYER")) aktivplayer = TRUE;
-		if (FindToolType((STRPTR *)info->do_ToolTypes, "AUDIOCD")) aktivaudiocd = TRUE;
-		if (str = FindToolType((STRPTR *)info->do_ToolTypes, "CDDRIVE")) strcpy(cddrive, str);
-		if (str = FindToolType((STRPTR *)info->do_ToolTypes, "GAMEPATH")) {
-			if (gamedirlock = Lock(str, ACCESS_READ)) {
+	if ((info = GetDiskObject(prgname))) {
+		if (FindToolType((CONST_STRPTR *)info->do_ToolTypes, "DEVMODE")) devmodus = TRUE;
+		if (FindToolType((CONST_STRPTR *)info->do_ToolTypes, "SOUND")) aktivsound = TRUE;
+		if (FindToolType((CONST_STRPTR *)info->do_ToolTypes, "PLAYER")) aktivplayer = TRUE;
+		if (FindToolType((CONST_STRPTR *)info->do_ToolTypes, "AUDIOCD")) aktivaudiocd = TRUE;
+		if ((str = FindToolType((CONST_STRPTR *)info->do_ToolTypes, "CDDRIVE"))) strcpy(cddrive, str);
+		if ((str = FindToolType((CONST_STRPTR *)info->do_ToolTypes, "GAMEPATH"))) {
+			if ((gamedirlock = Lock(str, ACCESS_READ))) {
 				startdirlock = CurrentDir(gamedirlock);
 				NameFromLock(startdirlock, speicherpfad, 300);
 				UnLock(startdirlock);
 			} else Fehler(4, "Spielpfad");
 		}
-		if (str = FindToolType((STRPTR *)info->do_ToolTypes, "MINFREE")) minfree = atol(str)*1048576;
+		if ((str = FindToolType((CONST_STRPTR *)info->do_ToolTypes, "MINFREE"))) minfree = atol(str)*1048576;
 		FreeDiskObject(info);
 	}
 
@@ -516,6 +528,9 @@ void Ende() {
 	if (gamedirlock) UnLock(gamedirlock);
 	CloseLibrary(CyberGfxBase);
 	CloseLibrary(LowLevelBase);
+	if (!trerr) CloseDevice((struct IORequest *)trreq);
+	if (trreq) DeleteIORequest((struct IORequest *)trreq);
+	if (trport) DeleteMsgPort(trport);
 }
 
 void Fehler(UWORD num, STRPTR t) {
@@ -537,7 +552,7 @@ void Fehler(UWORD num, STRPTR t) {
 	};
 
 	Ende();
-	EasyRequest(NULL, &estr, NULL, fehl[num], t);
+	EasyRequest(NULL, &estr, NULL, (ULONG)fehl[num], (ULONG)t);
 
 	exit(0);
 }
@@ -689,18 +704,18 @@ void hauptteil() {
 					} else {
 						StoppeReden();
 						if (akttyp == 1) {
-							feld = (FELD *)aktzeig;
+							feld = (struct FELD *)aktzeig;
 							if (hauptsichtbar) PersonenAktion(0, AKT_LAUFEN, feld->gehx, feld->gehy, iannumgehen, 0); else erreicht = TRUE;
 							benutzt = aktid;
 						}
 						if (akttyp == 2) {
-							objekt=(OBJEKT *)aktzeig;
+							objekt = (struct OBJEKT *)aktzeig;
 							if (hauptsichtbar) PersonenAktion(0, AKT_LAUFEN, objekt->gehx, objekt->gehy, iannumgehen, 0); else erreicht = TRUE;
 							benutzt = aktid;
 						}
 						if (akttyp == 3) {
 							hauptperson = SucheIDPerson(0);
-							person = (PERSON *)aktzeig;
+							person = (struct PERSON *)aktzeig;
 							person->isfaktiv = FALSE;
 							person->aktion = AKT_NICHTS;
 							if (hauptsichtbar) {
@@ -726,7 +741,7 @@ void hauptteil() {
 							if (invbenutzt == 0) {
 								MausStatusEcke(TRUE);
 								invbenutzt = aktid;
-								aktinv = (INVGEG *)aktzeig;
+								aktinv = (struct INVGEG *)aktzeig;
 								inv.animnum = 0; inv.animp = 0;
 							} else {
 								MausStatusEcke(FALSE);
@@ -753,15 +768,15 @@ void hauptteil() {
 						StoppeReden();
 						angesehen = aktid; benutzt = 0;
 						if (akttyp == 1) {
-							feld = (FELD *)aktzeig;
+							feld = (struct FELD *)aktzeig;
 							if (hauptsichtbar) PersonenAktion(0, AKT_LAUFEN, feld->gehx, feld->gehy, iannumgehen, 2); else erreicht = TRUE;
 						}
 						if (akttyp == 2) {
-							objekt = (OBJEKT *)aktzeig;
+							objekt = (struct OBJEKT *)aktzeig;
 							if (hauptsichtbar) PersonenAktion(0, AKT_LAUFEN, objekt->gehx, objekt->gehy, iannumgehen, 2); else erreicht = TRUE;
 						}
 						if (akttyp == 3) {
-							person = (PERSON *)aktzeig;
+							person = (struct PERSON *)aktzeig;
 							PersonRichtung(0, (WORD)person->x, (WORD)person->y);
 							MausStatusSichtbar(FALSE);
 							ingaptr = listeptr; modus = 0;
@@ -801,6 +816,7 @@ void hauptteil() {
 
 /*=============================CLI/WB Start================================*/
 
+#if defined(__STORM__) || defined(__STORMGCC__)
 void main() {
 	GetProgramName(prgname, 256);
 	hauptteil();
@@ -811,3 +827,11 @@ void wbmain(struct WBStartup *argmsg) {
 	strcpy(prgname, argmsg->sm_ArgList->wa_Name);
 	hauptteil();
 }
+#else
+extern struct WBStartup *_WBenchMsg;
+
+int main(int argc, char **argv) {
+	strcpy(prgname, _WBenchMsg ? (char *)_WBenchMsg->sm_ArgList->wa_Name : argv[0]);
+	hauptteil();
+}
+#endif

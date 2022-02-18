@@ -35,7 +35,7 @@ extern void *aktzeig;
 struct OBJEKT *AddObjekt(UWORD id, WORD x, WORD y, STRPTR datei, STRPTR name, WORD gehx, WORD gehy) {
 	struct OBJEKT *neu;
 
-	if (neu = malloc(sizeof(OBJEKT))) {
+	if ((neu = malloc(sizeof(struct OBJEKT)))) {
 		neu->x = x; neu->y = y;
 		neu->id = id;
 		strncpy(neu->name, name, 61);
@@ -49,7 +49,7 @@ struct OBJEKT *AddObjekt(UWORD id, WORD x, WORD y, STRPTR datei, STRPTR name, WO
 		neu->next = rootobjekt;
 		rootobjekt = neu;
 	} else Fehler(0, datei);
-	return(neu)
+	return(neu);
 }
 
 void EntferneObjekt(UWORD id) {

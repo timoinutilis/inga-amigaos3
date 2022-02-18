@@ -80,8 +80,8 @@ struct CACHE *COpen(STRPTR datei) {
 	}
 	if (neu) return(neu);
 
-	if (neu = malloc(sizeof(struct CACHE))) {
-		if (file = Open(datei, MODE_OLDFILE)) {
+	if ((neu = malloc(sizeof(struct CACHE)))) {
+		if ((file = Open(datei, MODE_OLDFILE))) {
 			Seek(file, 0, OFFSET_END);
 			neu->grosse = Seek(file, 0, OFFSET_BEGINNING);
 			

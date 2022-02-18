@@ -6,17 +6,13 @@
 #include <devices/timer.h>
 
 #include <proto/exec.h>
+#include <proto/cdplayer.h>
 #include <proto/dos.h>
 #include <proto/timer.h>
 
+#include "ingaaudiocd.h"
 #include "kernel.h"
 #include "device_info.h"
-
-//Prototypen
-BYTE CDPlay(ULONG, ULONG, struct IOStdReq *);
-BYTE CDStop(struct IOStdReq *);
-BYTE CDTitleTime(struct CD_Time *, struct IOStdReq *);
-BYTE CDReadTOC(struct CD_TOC *, struct IOStdReq *);
 
 //Systemzeiger
 struct Library *CDPlayerBase = NULL;
@@ -42,10 +38,10 @@ void StarteAudioCDTreiber() {
 	struct device_info_s *dev;
 	//Treiber starten und alles initialisieren.
 
-	if (CDPlayerBase = OpenLibrary("cdplayer.library", 0)) {
-		if (dev = get_device_info(cddrive)) {
-			if (cdport = CreateMsgPort()) {
-				if (cdreq = (struct IOStdReq *)CreateIORequest(cdport, sizeof(struct IOStdReq))) {
+	if ((CDPlayerBase = OpenLibrary("cdplayer.library", 0))) {
+		if ((dev = get_device_info(cddrive))) {
+			if ((cdport = CreateMsgPort())) {
+				if ((cdreq = (struct IOStdReq *)CreateIORequest(cdport, sizeof(struct IOStdReq)))) {
 					cderr = OpenDevice(dev->device, dev->unit, (struct IORequest *)cdreq, 0);
 				}
 			}

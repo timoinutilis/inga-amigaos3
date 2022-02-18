@@ -1,6 +1,10 @@
 // Prototypen
 void StoppeReden();
-void Fehler(UWORD num, STRPTR t);
+void Fehler(UWORD num, STRPTR t)
+#ifdef __GNUC__
+__attribute__((noreturn))
+#endif
+;
 void Meldung(STRPTR t);
 void Maus();
 void StandartMauszeiger();

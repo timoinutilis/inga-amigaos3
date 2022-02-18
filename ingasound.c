@@ -30,23 +30,25 @@ void StarteIngaSound() {
 	UBYTE z;
 	BPTR file;
 	
-	if (file = Open("IngaSound", MODE_OLDFILE)) {
+	if ((file = Open("IngaSound", MODE_OLDFILE))) {
 		Close(file);
 
 		SystemTags("IngaSound",
+			SYS_Input, NULL,
+			SYS_Output, NULL,
 			SYS_Asynch, TRUE,
 			NP_StackSize, 8192,
 			TAG_DONE);
 
 		Forbid();
 		for (z = 0; z < 6; z++) {
-			if (sndport = FindPort("IngaSoundPort")) break;
+			if ((sndport = FindPort("IngaSoundPort"))) break;
 			Delay(20);
 		}
 		Permit();
 
 		if (sndport) {	
-			smsg.ExecMessage.mn_Length = sizeof(SOUNDMESSAGE);
+			smsg.ExecMessage.mn_Length = sizeof(struct SOUNDMESSAGE);
 			smsg.soundbase = &soundbase;
 			smsg.busy = TRUE;
 			smsg.cancel = FALSE;

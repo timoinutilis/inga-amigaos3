@@ -24,7 +24,7 @@ extern struct ORT ort;
 struct ZIERDE *AddZierde(UWORD id, WORD x, WORD y, STRPTR datei) {
 	struct ZIERDE *neu;
 
-	if (neu = malloc(sizeof(ZIERDE))) {
+	if ((neu = malloc(sizeof(struct ZIERDE)))) {
 		neu->x = x; neu->y = y;
 		neu->id = id;
 		neu->animnum = 0; neu->animp = 0;
@@ -34,7 +34,7 @@ struct ZIERDE *AddZierde(UWORD id, WORD x, WORD y, STRPTR datei) {
 		neu->next = rootzierde;
 		rootzierde = neu;
 	} else Fehler(0, datei);
-	return(neu)
+	return(neu);
 }
 
 void EntferneZierde(UWORD id) {

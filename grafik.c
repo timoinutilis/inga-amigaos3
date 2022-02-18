@@ -59,7 +59,7 @@ struct BitMap *LadeIMP(STRPTR datei) {
 
 	MausStatusWarte(TRUE);
 	if (!(file = COpen(datimp))) {
-		if (p = strrchr(datimp, '_')) {
+		if ((p = strrchr(datimp, '_'))) {
 			strcpy(p, ".imp");
 			file = COpen(datimp);
 		}
@@ -91,8 +91,8 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 	strcpy(datibm, "BitMaps/"); strcat(datibm, datei); strcat(datibm, ".ibm");
 
 	MausStatusWarte(TRUE);
-	if (file = COpen(datibm)) {
-		if (ibm = malloc(sizeof(struct IBM))) {
+	if ((file = COpen(datibm))) {
+		if ((ibm = malloc(sizeof(struct IBM)))) {
 			CRead(file, ibm, sizeof(struct IBM) - 8);
 			if (ibm->flags & 1) CRead(file, &globrgb[0], 768);
 			if (ibm->flags & 2) {
@@ -120,7 +120,7 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 				if (maske == MASKE_KEINE) ibm->maske = NULL;
 				if (maske == MASKE_DATEI) ibm->maske = LadeIMP(datei);
 				if (maske == MASKE_ERSTELLEN) {
-					if (ibm->maske = AllocBitMap(ibm->breite, ibm->hoehe, 1, NULL, NULL)) {
+					if ((ibm->maske = AllocBitMap(ibm->breite, ibm->hoehe, 1, NULL, NULL))) {
 						p = (UWORD *)ibm->maske->Planes[0];
 						for (y = 0; y < ibm->hoehe; y++) {
 							b = 16; m = 0;
@@ -158,7 +158,7 @@ void EntferneIBMIMP(struct IBM *ibm) {
 void BildWechsel() {
 	while (!ChangeScreenBuffer(schirm, sbuf[sbnum])) WaitTOF();
 	WaitPort(sbport[sbnum]);
-	while (sbmsg = GetMsg(sbport[sbnum]));
+	while ((sbmsg = GetMsg(sbport[sbnum])));
 	if (sbnum == 0) sbnum = 1; else sbnum = 0;
 }
 
@@ -245,10 +245,11 @@ void LadeHintergrund(STRPTR datei) {
 	if (!ort.ibm) {
 		ort.ibm = malloc(sizeof(struct IBM));
 		ort.ibm->bild = AllocBitMap(640, 480, 8, BMF_MINPLANES | BMF_SPECIALFMT, schirm->RastPort.BitMap);
+		ort.ibm->maske = NULL;
 	}
 
 	MausStatusWarte(TRUE);
-	if (file = COpen(datibm)) {
+	if ((file = COpen(datibm))) {
 		CRead(file, ort.ibm, sizeof(struct IBM) - 8);
 		if (ort.ibm->flags & 1) CRead(file, &globrgb[0], 768);
 		if (ort.ibm->flags & 2) CPtr(file, sizeof(struct IAN) - 4);
@@ -272,7 +273,7 @@ void LadeHintergrund(STRPTR datei) {
 void RestauriereHintergrund(WORD x, WORD y, UWORD breite, UWORD hoehe) {
 	struct RESTAUR *neu;
 	
-	if (neu = malloc(sizeof(RESTAUR))) {
+	if ((neu = malloc(sizeof(struct RESTAUR)))) {
 		neu->x = x; neu->y = y;
 		neu->b = breite; neu->h = hoehe;
 		neu->letztes = FALSE;

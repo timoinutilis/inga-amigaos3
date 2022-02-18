@@ -53,15 +53,15 @@ extern ULONG ingaptr;
 extern ULONG escptr;
 
 //Elementzeiger
-extern VARIABLE *rootvar;
-extern SICHT *rootsicht;
-extern INVGEG *rootgeg;
+extern struct VARIABLE *rootvar;
+extern struct SICHT *rootsicht;
+extern struct INVGEG *rootgeg;
 
 //Datenstrukturen
-extern ORT ort;
-extern SPRECH sprech;
+extern struct ORT ort;
+extern struct SPRECH sprech;
 extern UBYTE globrgb[768];
-extern SPIELZEIT zeit;
+extern struct SPIELZEIT zeit;
 UBYTE menurgb[768];
 struct MENU menu = {NULL, NULL, NULL, NULL};
 
@@ -98,7 +98,7 @@ void Prozess(UWORD num, UWORD von) {
 
 void SpeicherDir() {
 	if (speicherpfad[0] && !savelock) {
-		if (savelock = Lock(speicherpfad, ACCESS_READ)) {
+		if ((savelock = Lock(speicherpfad, ACCESS_READ))) {
 			spiellock = CurrentDir(savelock);
 		}
 	}
@@ -116,14 +116,14 @@ void LadeSlotnamen() {
 	UBYTE z;
 
 	SpeicherDir();
-	if (file = Open("Saves/Index", MODE_OLDFILE)) {
+	if ((file = Open("Saves/Index", MODE_OLDFILE))) {
 		Read(file, &slotname[0][0], 6 * 60);
 		Close(file);
 	} else {
-		if (file = Lock("Saves/", ACCESS_READ)) {
+		if ((file = Lock("Saves/", ACCESS_READ))) {
 			UnLock(file);
 		} else {
-			if (file = CreateDir("Saves")) UnLock(file);
+			if ((file = CreateDir("Saves"))) UnLock(file);
 		}
 
 		for(z = 0; z < 6; z++) {
@@ -137,7 +137,7 @@ void SpeichereSlotnamen() {
 	BPTR file;
 	
 	SpeicherDir();
-	if (file = Open("Saves/Index", MODE_NEWFILE)) {
+	if ((file = Open("Saves/Index", MODE_NEWFILE))) {
 		Write(file, &slotname[0][0], 6 * 60);
 		Close(file);
 	}
@@ -152,7 +152,7 @@ void Registriert(STRPTR text) {
 	UBYTE reg[100];
 	BOOL regis = FALSE;
 	
-	if (file = Open("Dats/reg", MODE_OLDFILE)) {
+	if ((file = Open("Dats/reg", MODE_OLDFILE))) {
 		Read(file, reg, 100);
 		Close(file);
 		
@@ -283,7 +283,7 @@ void Eingabe(UBYTE slot) {
 		
 		blink++; if (blink > 10) blink = 0;
 
-		while (mes = (struct IntuiMessage *)GetMsg(fenster->UserPort)) {
+		while ((mes = (struct IntuiMessage *)GetMsg(fenster->UserPort))) {
 			if (mes->Class == IDCMP_VANILLAKEY) {
 				if (mes->Code == 13 && len > 0) ende = TRUE;
 				if (mes->Code == 8) {
@@ -331,8 +331,8 @@ BOOL SpielstandSpeichern(UBYTE slot) {
 	FLOAT schritt;
 	
 	SpeicherDir();
-	sprintf(dat, "Saves/Stand%ld.sav", slot);
-	if (file = Open(dat, MODE_NEWFILE)) {
+	sprintf(dat, "Saves/Stand%d.sav", slot);
+	if ((file = Open(dat, MODE_NEWFILE))) {
 		MausStatusWarte(TRUE);
 		insg = VarAnzahl() + SichtAnzahl() + InvAnzahl() + 1;
 		schritt = 21 / (FLOAT)insg;
@@ -352,55 +352,55 @@ BOOL SpielstandSpeichern(UBYTE slot) {
 		save.anzvar = VarAnzahl();
 		save.anzsicht = SichtAnzahl();
 		save.anzgeg = InvAnzahl();
-		Write(file, &save, sizeof(SAVE));
+		Write(file, &save, sizeof(struct SAVE));
 		z = z + schritt;
 		if ((WORD)z > altz) {
 			altz = (WORD)z; Prozess((UWORD)z, 20); BildWechsel();
 		}
 
 		//Variablen sichern.
-		if (mem = malloc(save.anzvar * sizeof(VARIABLE))) {
+		if ((mem = malloc(save.anzvar * sizeof(struct VARIABLE)))) {
 			aktvar = rootvar; ptr = (ULONG)mem;
 			while (aktvar) {
-				CopyMem(aktvar, (APTR)ptr, sizeof(VARIABLE));
-				ptr = ptr + sizeof(VARIABLE);
+				CopyMem(aktvar, (APTR)ptr, sizeof(struct VARIABLE));
+				ptr = ptr + sizeof(struct VARIABLE);
 				aktvar = aktvar->next;
 				z = z + schritt;
 				if ((WORD)z > altz) {
 					altz = (WORD)z; Prozess((UWORD)z, 20); BildWechsel();
 				}
 			}
-			Write(file, mem, save.anzvar * sizeof(VARIABLE));
+			Write(file, mem, save.anzvar * sizeof(struct VARIABLE));
 			free(mem);
 		
 			//Sichtbarkeit sichern.
-			if (mem = malloc(save.anzsicht * sizeof(SICHT))) {
+			if ((mem = malloc(save.anzsicht * sizeof(struct SICHT)))) {
 				aktsicht = rootsicht; ptr = (ULONG)mem;
 				while (aktsicht) {
-					CopyMem(aktsicht, (APTR)ptr, sizeof(SICHT));
-					ptr = ptr + sizeof(SICHT);
+					CopyMem(aktsicht, (APTR)ptr, sizeof(struct SICHT));
+					ptr = ptr + sizeof(struct SICHT);
 					aktsicht = aktsicht->next;
 					z = z + schritt;
 					if ((WORD)z > altz) {
 						altz = (WORD)z; Prozess((WORD)z, 20); BildWechsel();
 					}
 				}
-				Write(file, mem, save.anzsicht * sizeof(SICHT));
+				Write(file, mem, save.anzsicht * sizeof(struct SICHT));
 				free(mem);
 		
 				//Inventar sichern.
-				if (mem = malloc(save.anzgeg * sizeof(INVGEG))) {
+				if ((mem = malloc(save.anzgeg * sizeof(struct INVGEG)))) {
 					aktgeg = rootgeg; ptr=(ULONG)mem;
 					while (aktgeg) {
-						CopyMem(aktgeg, (APTR)ptr, sizeof(INVGEG));
-						ptr = ptr + sizeof(INVGEG);
+						CopyMem(aktgeg, (APTR)ptr, sizeof(struct INVGEG));
+						ptr = ptr + sizeof(struct INVGEG);
 						aktgeg = aktgeg->next;
 						z = z + schritt;
 						if ((WORD)z > altz) {
 							altz = (WORD)z; Prozess((UWORD)z, 20); BildWechsel();
 						}
 					}
-					Write(file, mem, save.anzgeg * sizeof(INVGEG));
+					Write(file, mem, save.anzgeg * sizeof(struct INVGEG));
 					free(mem); ok = TRUE;
 				}
 			}
@@ -431,14 +431,14 @@ BOOL SpielstandLaden(UBYTE slot) {
 	char eingabe[20];
 	
 	SpeicherDir();
-	sprintf(dat, "Saves/Stand%ld.sav", slot);
-	if (file = Open(dat, MODE_OLDFILE)) {
+	sprintf(dat, "Saves/Stand%d.sav", slot);
+	if ((file = Open(dat, MODE_OLDFILE))) {
 		MausStatusWarte(TRUE);
 		SpielDir();
 	
 		//Grunddaten laden.
-		Prozess(0, insg); BildWechsel();
-		Read(file, &save, sizeof(SAVE));
+		Prozess(0, 20); BildWechsel();
+		Read(file, &save, sizeof(struct SAVE));
 		person = SucheIDPerson(0);
 		person->x = save.x;
 		person->y = save.y;
@@ -463,9 +463,9 @@ BOOL SpielstandLaden(UBYTE slot) {
 		}
 		
 		//Variablen laden.
-		if (mem = malloc(save.anzvar * sizeof(VARIABLE))) {
+		if ((mem = malloc(save.anzvar * sizeof(struct VARIABLE)))) {
 			variable = (struct VARIABLE *)mem;
-			Read(file, mem, save.anzvar * sizeof(VARIABLE));
+			Read(file, mem, save.anzvar * sizeof(struct VARIABLE));
 			for (i = 0; i < save.anzvar; i++) {
 				SetzeVar(variable->vid, variable->wert);
 				variable++;
@@ -477,9 +477,9 @@ BOOL SpielstandLaden(UBYTE slot) {
 			free(mem);
 		
 			//Sichts laden.
-			if (mem = malloc(save.anzsicht * sizeof(SICHT))) {
+			if ((mem = malloc(save.anzsicht * sizeof(struct SICHT)))) {
 				sicht = (struct SICHT *)mem;
-				Read(file, mem, save.anzsicht * sizeof(SICHT));
+				Read(file, mem, save.anzsicht * sizeof(struct SICHT));
 				for (i = 0; i < save.anzsicht; i++) {
 					SetzeSicht(sicht->ortid, sicht->elemid, sicht->sichtbar);
 					sicht++;
@@ -491,9 +491,9 @@ BOOL SpielstandLaden(UBYTE slot) {
 				free(mem);
 		
 				//Inventar laden.
-				if (mem = malloc(save.anzgeg * sizeof(INVGEG))) {
+				if ((mem = malloc(save.anzgeg * sizeof(struct INVGEG)))) {
 					geg = (struct INVGEG *)mem;
-					Read(file, mem, save.anzgeg * sizeof(INVGEG));
+					Read(file, mem, save.anzgeg * sizeof(struct INVGEG));
 					for (i = 0; i < save.anzgeg; i++) {
 						AddInventar(geg->datei, geg->name, geg->id);
 						geg++;

@@ -29,7 +29,7 @@ extern struct ORT ort;
 struct IAN *LadeIAN(STRPTR datei, WORD maske) {
 	struct IAN *ian;
 
-	if (ian = malloc(sizeof(IAN))) {
+	if ((ian = malloc(sizeof(struct IAN)))) {
 		ian->ibm = LadeIBM(datei, maske);
 		memcpy(ian, &globian, sizeof(struct IAN) - 4);
 	} else Fehler(0, datei);

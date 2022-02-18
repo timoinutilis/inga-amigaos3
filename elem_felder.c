@@ -29,7 +29,7 @@ extern void *aktzeig;
 struct FELD *AddFeld(UWORD id, WORD lox, WORD loy, WORD rux, WORD ruy, STRPTR name, WORD gehx, WORD gehy) {
 	struct FELD *neu;
 
-	if (neu = malloc(sizeof(FELD))) {
+	if ((neu = malloc(sizeof(struct FELD)))) {
 		neu->lox = lox; neu->loy = loy;
 		neu->rux = rux; neu->ruy = ruy;
 		neu->id = id;

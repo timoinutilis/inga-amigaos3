@@ -11,7 +11,7 @@ Includepath (End)
 0
 0 0
 0
-0 1
+0 0
 C/C++ Preprozessor
 1 "NDEBUG" ""
 0
@@ -34,13 +34,13 @@ Defines (End)
 1 0 0 1 1 1 0
 0 2 1 0 0
 0 0 0 0 1 0 0
-0 0 0 0
+6 0 0 0
 0 ""
-2 0 0 0
-1 0 0 1 0 1 0 1 0 1
+2 1 0 0
+0 0 0 1 0 1 0 1 0 1
 1 1 0 1 0 1
 0 1 1 1 1 0 0
-1 0 0 0 0
+0 0 0 0 0
 Assembler
 0 ""
 0 "CON://640/200/Storm Assembler/AUTO/WAIT/SCREEN StormScreen"
@@ -77,7 +77,7 @@ File
 "kernel.h"
 "grafik.h"
 "animation.h"
-"Textausgabe.h"
+"textausgabe.h"
 "elem_felder.h"
 "elem_zierden.h"
 "elem_objekte.h"
@@ -117,12 +117,12 @@ Storm Shell Project (Dependencies)
 ""
 1 1
 File
-1 "Textausgabe.c"
-"Textausgabe.c"
+1 "textausgabe.c"
+"textausgabe.c"
 "strukturen.h"
-"Textausgabe.h"
+"textausgabe.h"
 Storm Shell Project (Dependencies)
-"objects/Textausgabe.o" "objects/Textausgabe.debug"
+"objects/textausgabe.o" "objects/textausgabe.debug"
 ""
 1 1
 File
@@ -215,7 +215,7 @@ File
 "dialog.c"
 "strukturen.h"
 "dialog.h"
-"Textausgabe.h"
+"textausgabe.h"
 "grafik.h"
 "kernel.h"
 Storm Shell Project (Dependencies)
@@ -227,7 +227,7 @@ File
 "sequenzen.c"
 "strukturen.h"
 "grafik.h"
-"Textausgabe.h"
+"textausgabe.h"
 "ingasound.h"
 "kernel.h"
 "cache.h"
@@ -280,6 +280,7 @@ File
 1 "ingaplayer.c"
 "ingaplayer.c"
 "kernel.h"
+"ingaplayer.h"
 Storm Shell Project (Dependencies)
 "objects/ingaplayer.o" "objects/ingaplayer.debug"
 ""
@@ -289,6 +290,7 @@ File
 "ingaaudiocd.c"
 "kernel.h"
 "device_info.h"
+"ingaaudiocd.h"
 Storm Shell Project (Dependencies)
 "objects/ingaaudiocd.o" "objects/ingaaudiocd.debug"
 ""
@@ -327,8 +329,8 @@ Storm Shell Project (Dependencies)
 ""
 0 0
 File
-2 "Textausgabe.h"
-"Textausgabe.h"
+2 "textausgabe.h"
+"textausgabe.h"
 Storm Shell Project (Dependencies)
 "" ""
 ""
@@ -437,7 +439,8 @@ Section
 0 0 0 0
 7
 File
-10 "Games:Ermentrud/Ermentrud"
+10 "Inga"
+"Inga"
 Storm Shell Project (Dependencies)
 "" ""
 ""
@@ -456,13 +459,6 @@ Storm Shell Project (Dependencies)
 File
 5 "amiga.lib"
 "amiga.lib"
-Storm Shell Project (Dependencies)
-"" ""
-""
-0 0
-File
-5 "cdplayer.lib"
-"cdplayer.lib"
 Storm Shell Project (Dependencies)
 "" ""
 ""

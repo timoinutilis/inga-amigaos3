@@ -105,17 +105,17 @@ void LadeINGA() {
 	LONG len;
 
 	MausStatusWarte(TRUE);
-	if (file = Open("Dats/story.inga", MODE_OLDFILE)) {
+	if ((file = Open("Dats/story.inga", MODE_OLDFILE))) {
 		Seek(file, 0, OFFSET_END); len = Seek(file, 0, OFFSET_BEGINNING);
-		if (inga = malloc(len)) {
+		if ((inga = malloc(len))) {
 			Read(file, inga, len);
 		} else Fehler(0, "story.inga");
 		Close(file);
 	} else Fehler(2, "story.inga");
 	
-	if (file = Open("Dats/story.itxt", MODE_OLDFILE)) {
+	if ((file = Open("Dats/story.itxt", MODE_OLDFILE))) {
 		Seek(file, 0, OFFSET_END); len = Seek(file, 0, OFFSET_BEGINNING);
-		if (itxt = malloc(len)) {
+		if ((itxt = malloc(len))) {
 			Read(file, itxt, len);
 		} else Fehler(0, "story.itxt");
 		Close(file);
@@ -256,7 +256,7 @@ ULONG LaufeINGA(ULONG ptr, BOOL *wieder) {
 	}
 	if (opc == 42) { //Sichtbar.
 		if (peekw(ptr + 4) == 0) {
-			hauptsichtbar = TRUE
+			hauptsichtbar = TRUE;
 		} else {
 			SetzeSicht(peekw(ptr + 2), peekw(ptr + 4), TRUE);
 		}
@@ -265,7 +265,7 @@ ULONG LaufeINGA(ULONG ptr, BOOL *wieder) {
 	}
 	if (opc == 18) { //Unsichtbar.
 		if (peekw(ptr + 4) == 0) {
-			hauptsichtbar = FALSE
+			hauptsichtbar = FALSE;
 		} else {
 			SetzeSicht(peekw(ptr + 2), peekw(ptr + 4), FALSE);
 		}
@@ -719,7 +719,7 @@ ULONG LaufeINGA(ULONG ptr, BOOL *wieder) {
 		return(ptr + 4);
 	}
 
-	printf("PC:%ld Opc:%ld\n", ptr, opc);
+	printf("PC:%ld Opc:%d\n", ptr, opc);
 	Fehler(6, "Unbekannter Skriptbefehl");	
 }
 
@@ -744,7 +744,7 @@ UWORD VarInit(UWORD vid, UWORD wert) {
 		akt = akt->next;
 	}
 	
-	if (neu = malloc(sizeof(struct VARIABLE))) {
+	if ((neu = malloc(sizeof(struct VARIABLE)))) {
 		neu->vid = vid;
 		neu->wert = wert;
 
@@ -814,7 +814,7 @@ BOOL SichtInit(UBYTE ortid, UBYTE elemid, BOOL wert) {
 		akt = akt->next;
 	}
 	
-	if (neu = malloc(sizeof(struct SICHT))) {
+	if ((neu = malloc(sizeof(struct SICHT)))) {
 		neu->ortid = ortid;
 		neu->elemid = elemid;
 		neu->sichtbar = wert;

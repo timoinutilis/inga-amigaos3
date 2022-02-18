@@ -8,7 +8,7 @@
 
 #include "strukturen.h"
 #include "dialog.h"
-#include "Textausgabe.h"
+#include "textausgabe.h"
 #include "grafik.h"
 #include "kernel.h"
 
@@ -38,7 +38,7 @@ struct DIALOG dialog = {0, FALSE};
 struct ANTWORT *AddAntwort(UBYTE id, STRPTR text) {
 	struct ANTWORT *neu;
 
-	if (neu = malloc(sizeof(ANTWORT))) {
+	if ((neu = malloc(sizeof(struct ANTWORT)))) {
 		neu->aid = id;
 		strcpy(neu->text, text);
 		neu->next = rootantwort;

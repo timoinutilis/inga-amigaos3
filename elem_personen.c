@@ -63,7 +63,7 @@ void LadeLaufkarte(STRPTR datei) {
 	strcpy(datilk, "Dats/"); strcat(datilk, datei); strcat(datilk, ".ilk");
 
 	if (!(file = COpen(datilk))) {
-		if (p = strrchr(datilk, '_')) {
+		if ((p = strrchr(datilk, '_'))) {
 			strcpy(p, ".ilk");
 			file = COpen(datilk);
 		}
@@ -114,11 +114,11 @@ struct IPE *LadeIPE(STRPTR datei) {
 	UWORD anz;
 
 	strcpy(datipe, "Dats/"); strcat(datipe, datei); strcat(datipe, ".ipe");
-	if (file = COpen(datipe)) {
+	if ((file = COpen(datipe))) {
 		CRead(file, &anz, sizeof(UWORD));
 		if (anz > 0) {
-			if (root = malloc(sizeof(IPE))) {
-				CRead(file, &dipe, sizeof(DIPE));
+			if ((root = malloc(sizeof(struct IPE)))) {
+				CRead(file, &dipe, sizeof(struct DIPE));
 				root->id = dipe.id;
 				root->ri = dipe.ri;
 				strcpy(root->datei, dipe.datei);
@@ -126,8 +126,8 @@ struct IPE *LadeIPE(STRPTR datei) {
 				root->next = NULL;
 				alt = root;
 				for (i = 1; i < anz; i++) {
-					if (neu = malloc(sizeof(IPE))) {
-						CRead(file, &dipe, sizeof(DIPE));
+					if ((neu = malloc(sizeof(struct IPE)))) {
+						CRead(file, &dipe, sizeof(struct DIPE));
 						neu->id = dipe.id;
 						neu->ri = dipe.ri;
 						strcpy(neu->datei, dipe.datei);
@@ -177,7 +177,7 @@ void SetzeIPEIAN(struct PERSON *pers, UWORD id) {
 		if (!ipe) {
 			if (((ULONG)iperi[0] + (ULONG)iperi[1] + (ULONG)iperi[2] + (ULONG)iperi[3]) == NULL) {
 				ipe = pers->ipe;
-				printf("SetzeIPEIAN Fehler:%ld\n", id);
+				printf("SetzeIPEIAN Fehler:%d\n", id);
 			} else {
 				if (pers->richtung == RI_LINKS) {
 					ipe = iperi[RI_VORNE];
@@ -222,7 +222,7 @@ void Vorladen(UWORD id, UWORD iannum) {
 	struct PERSON *person;
 	struct IPE *ipe;
 
-	if (person = SucheIDPerson(id)) {
+	if ((person = SucheIDPerson(id))) {
 		ipe = person->ipe;
 		while (ipe) {
 			if ((ipe->id == iannum) && !ipe->ian) ipe->ian = LadeIAN(ipe->datei, MASKE_ERSTELLEN);
@@ -235,7 +235,7 @@ void Freigeben(UWORD id, UWORD iannum) {
 	struct PERSON *person;
 	struct IPE *ipe;
 
-	if (person = SucheIDPerson(id)) {
+	if ((person = SucheIDPerson(id))) {
 		ipe = person->ipe;
 		while (ipe) {
 			if ((ipe->id == iannum) && !ipe->ian) {
@@ -250,7 +250,7 @@ void Freigeben(UWORD id, UWORD iannum) {
 struct PERSON *AddPerson(UWORD id, WORD x, WORD y, STRPTR datei, STRPTR name) {
 	struct PERSON *neu;
 
-	if (neu = malloc(sizeof(PERSON))) {
+	if ((neu = malloc(sizeof(struct PERSON)))) {
 		neu->x = x; neu->y = y;
 		neu->id = id;
 		strncpy(neu->name, name, 61);
@@ -260,7 +260,7 @@ struct PERSON *AddPerson(UWORD id, WORD x, WORD y, STRPTR datei, STRPTR name) {
 		neu->lauffaktor = 12;
 		neu->standiannum = 1;
 		neu->p1 = 0; neu->p2 = 0; neu->p3 = 0; neu->p4 = 0; neu->aktion = AKT_NICHTS;
-		neu->ian = NULL; neu->animid = 0;
+		neu->ian = NULL; neu->animid = 0; neu->animri = 0;
 		neu->animnum = 0; neu->animp = 0;
 		neu->richtung = RI_VORNE;
 		neu->isfaktiv = FALSE;
@@ -271,7 +271,7 @@ struct PERSON *AddPerson(UWORD id, WORD x, WORD y, STRPTR datei, STRPTR name) {
 		neu->next = rootperson;
 		rootperson = neu;
 	} else Fehler(0, datei);
-	return(neu)
+	return(neu);
 }
 
 void EntfernePerson(UWORD id) {

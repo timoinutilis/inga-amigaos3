@@ -16,7 +16,7 @@
 
 #include "strukturen.h"
 #include "grafik.h"
-#include "Textausgabe.h"
+#include "textausgabe.h"
 #include "cache.h"
 #include "ingasound.h"
 #include "ingaaudiocd.h"
@@ -49,7 +49,7 @@ void Sequenz(STRPTR datei) {
 	UBYTE zanz = 0;
 	UBYTE art = 0, bund = 0, farbe = 255, fadein = 2, fadeout = 2;
 	UWORD thoehe = 3, ttiefe = 476, txheight;
-	WORD zscrolly, tlen;
+	WORD zscrolly = 0, tlen;
 	FLOAT scrolly, abstand;
 	struct timeval alttime;
 	struct timeval timev;
@@ -57,9 +57,9 @@ void Sequenz(STRPTR datei) {
 
 	strcpy(dat, "Dats/"); strcat(dat, datei); strcat(dat,".isq");
 
-	if (file = Open(dat, MODE_OLDFILE)) {
+	if ((file = Open(dat, MODE_OLDFILE))) {
 		Seek(file, 0, OFFSET_END); len = Seek(file, 0, OFFSET_BEGINNING);
-		if (mem = malloc(len)) {
+		if ((mem = malloc(len))) {
 			Read(file, mem, len);
 			for(z = mem; (ULONG)z < (ULONG)mem + len; z++) {
 				if (*z == 0x0A) *z = 0;
@@ -179,9 +179,9 @@ void Sequenz(STRPTR datei) {
 							usel = atol(&z[2]); ttiefe = usel;
 							if (ttiefe > 476) ttiefe = 476;
 						}
-						if (z[1] == 'F') {usel = atol(&z[2]); farbe = usel}
-						if (z[1] == '<') {usel = atol(&z[2]); fadein = usel}
-						if (z[1] == '>') {usel = atol(&z[2]); fadeout = usel}
+						if (z[1] == 'F') {usel = atol(&z[2]); farbe = usel;}
+						if (z[1] == '<') {usel = atol(&z[2]); fadein = usel;}
+						if (z[1] == '>') {usel = atol(&z[2]); fadeout = usel;}
 					}
 
 				} else {

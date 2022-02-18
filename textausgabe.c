@@ -7,7 +7,7 @@
 #include <proto/graphics.h>
 
 #include "strukturen.h"
-#include "Textausgabe.h"
+#include "textausgabe.h"
 
 //Systemzeiger
 extern struct RastPort sbrp[2];
