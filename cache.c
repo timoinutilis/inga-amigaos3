@@ -7,6 +7,7 @@
 
 #include <proto/dos.h>
 #include <proto/exec.h>
+#include <proto/utility.h>
 
 #include "strukturen.h"
 #include "cache.h"

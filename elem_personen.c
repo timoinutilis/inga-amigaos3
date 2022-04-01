@@ -9,6 +9,7 @@
 
 #include <proto/dos.h>
 #include <proto/graphics.h>
+#include <proto/utility.h>
 
 #include "strukturen.h"
 #include "elem_personen.h"
@@ -175,9 +176,9 @@ void SetzeIPEIAN(struct PERSON *pers, UWORD id) {
 			akt = akt->next;
 		}
 		if (!ipe) {
-			if (((ULONG)iperi[0] + (ULONG)iperi[1] + (ULONG)iperi[2] + (ULONG)iperi[3]) == NULL) {
+			if (((ULONG)iperi[0] + (ULONG)iperi[1] + (ULONG)iperi[2] + (ULONG)iperi[3]) == 0) {
 				ipe = pers->ipe;
-				printf("SetzeIPEIAN Fehler:%d\n", id);
+				printf("SetzeIPEIAN Fehler:%u\n", id);
 			} else {
 				if (pers->richtung == RI_LINKS) {
 					ipe = iperi[RI_VORNE];

@@ -63,9 +63,9 @@ struct Screen *schirm = NULL;
 struct ScreenBuffer *sbuf[2] = {NULL, NULL};
 struct MsgPort *sbport[2] = {NULL, NULL};
 struct RastPort sbrp[2];
-BPTR assignlock = NULL;
+BPTR assignlock = 0;
 APTR font = NULL;
-BPTR gamedirlock = NULL;
+BPTR gamedirlock = 0;
 
 //Maus-/Tastaturvariablen
 WORD MausX;
@@ -78,7 +78,7 @@ BOOL MausSichtbar = TRUE;
 UBYTE Taste = 0;
 
 //Programmsystemvariablen
-char *ver = "$VER: Inga-Engine Version 1.17";
+char *ver = "$VER: Inga-Engine Version 1.18";
 char prgname[257] = {0};
 extern char cddrive[10];
 extern char speicherpfad[300];
@@ -320,7 +320,7 @@ void EntwicklerAktion() {
 			printf("Nummer: "); gets(eingabe[0]);
 			if (eingabe[0][0] > 0) {
 				n = atol(eingabe[0]);
-				printf("Wert (%d): ", VarWert(n)); gets(eingabe[0]);
+				printf("Wert (%u): ", VarWert(n)); gets(eingabe[0]);
 				if (eingabe[0][0] > 0) SetzeVar(n, atol(eingabe[0]));
 			}
 		break;
@@ -388,7 +388,7 @@ void Start() {
 	BOOL aktivplayer = FALSE;
 	BOOL aktivaudiocd = FALSE;
 	STRPTR str;
-	BPTR startdirlock = NULL;
+	BPTR startdirlock = 0;
 
 	if ((trport = CreateMsgPort())) {
 		if ((trreq = (struct timerequest *)CreateIORequest(trport, sizeof(struct timerequest)))) {
@@ -828,10 +828,8 @@ void wbmain(struct WBStartup *argmsg) {
 	hauptteil();
 }
 #else
-extern struct WBStartup *_WBenchMsg;
-
 int main(int argc, char **argv) {
-	strcpy(prgname, _WBenchMsg ? (char *)_WBenchMsg->sm_ArgList->wa_Name : argv[0]);
+	strcpy(prgname, argc == 0 ? (char *)((struct WBStartup *)argv)->sm_ArgList->wa_Name : argv[0]);
 	hauptteil();
 }
 #endif

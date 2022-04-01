@@ -71,8 +71,8 @@ BYTE aktpunkt;
 UWORD frame;
 FLOAT pausez;
 char slotname[6][60];
-BPTR savelock = NULL;
-BPTR spiellock = NULL;
+BPTR savelock = 0;
+BPTR spiellock = 0;
 
 
 /*======================================================*/
@@ -106,8 +106,8 @@ void SpeicherDir() {
 
 void SpielDir() {
 	if (spiellock) {
-		CurrentDir(spiellock); spiellock = NULL;
-		UnLock(savelock); savelock = NULL;
+		CurrentDir(spiellock); spiellock = 0;
+		UnLock(savelock); savelock = 0;
 	}
 }
 
@@ -331,7 +331,7 @@ BOOL SpielstandSpeichern(UBYTE slot) {
 	FLOAT schritt;
 	
 	SpeicherDir();
-	sprintf(dat, "Saves/Stand%d.sav", slot);
+	sprintf(dat, "Saves/Stand%u.sav", slot);
 	if ((file = Open(dat, MODE_NEWFILE))) {
 		MausStatusWarte(TRUE);
 		insg = VarAnzahl() + SichtAnzahl() + InvAnzahl() + 1;
@@ -431,7 +431,7 @@ BOOL SpielstandLaden(UBYTE slot) {
 	char eingabe[20];
 	
 	SpeicherDir();
-	sprintf(dat, "Saves/Stand%d.sav", slot);
+	sprintf(dat, "Saves/Stand%u.sav", slot);
 	if ((file = Open(dat, MODE_OLDFILE))) {
 		MausStatusWarte(TRUE);
 		SpielDir();
@@ -457,7 +457,7 @@ BOOL SpielstandLaden(UBYTE slot) {
 		}
 		if (devmodus) {
 			WBenchToFront();
-			printf("Zeiger (%ld): ", ingaptr);
+			printf("Zeiger (%lu): ", ingaptr);
 			gets(eingabe); if (eingabe[0] > 0) ingaptr = atol(eingabe);
 			ScreenToFront(schirm);
 		}

@@ -243,7 +243,7 @@ device_info_t *get_device_info(STRPTR name)
                 struct DosList *dos_list = LockDosList(ldl_flags);
                 struct FileSysStartupMsg *dst = NULL;
                 struct DosEnvec *env = NULL;
-                BSTR handler = NULL;
+                BSTR handler = 0;
 
                 dos_list = FindDosEntry(dos_list, device_info->name, ldl_flags);
 

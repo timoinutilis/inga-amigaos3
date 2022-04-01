@@ -34,7 +34,7 @@ void StarteIngaSound() {
 		Close(file);
 
 		SystemTags("IngaSound",
-			SYS_Input, NULL,
+			SYS_Input, Open("NIL:", MODE_NEWFILE),
 			SYS_Output, NULL,
 			SYS_Asynch, TRUE,
 			NP_StackSize, 8192,

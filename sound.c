@@ -2,15 +2,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef __GNUC__
-#define __REG__(r, p) p __asm(#r)
-#else
-#define __REG__(r, p) register __ ## r p
-#endif
-
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/ahi.h>
+#include <proto/utility.h>
 
 #include <exec/exec.h>
 #include <dos/dos.h>
@@ -55,7 +50,7 @@ BOOL offneAHI() {
 	if ((AHImp = CreateMsgPort())) {
 		if ((AHIio = (struct AHIRequest *)CreateIORequest(AHImp, sizeof(struct AHIRequest)))) {
 			AHIio->ahir_Version = 4;
-			if (!OpenDevice(AHINAME, AHI_NO_UNIT, (struct IORequest *) AHIio, NULL)) {
+			if (!OpenDevice(AHINAME, AHI_NO_UNIT, (struct IORequest *) AHIio, 0)) {
 				offen=TRUE;
 				AHIBase=(struct Library *)AHIio->ahir_Std.io_Device;
 				return(TRUE);
@@ -117,7 +112,7 @@ ULONG PrefsFreq() {
 // Dabei wird ein Signal geschickt.
 ULONG SoundFunc(__REG__(a0, struct Hook *hook), __REG__(a2, struct AHIAudioCtrl *audioctrl), __REG__(a1, struct AHISoundMessage *smsg)) {
 	Signal(audioctrl->ahiac_UserData, (1L<<sig));
-	return(NULL);
+	return(0);
 }
 
 int main() {
@@ -373,12 +368,12 @@ int main() {
 								// Nächsten Buffer laden
 								len=Read(file, addr, pufgr);
 								// Nächsten Buffer abspielen, sobald der vorherige beendet ist
-								AHI_SetSound(0, sound, 0, len>>faktor, audioctrl, NULL);
+								AHI_SetSound(0, sound, 0, len>>faktor, audioctrl, 0);
 
 							}
 							// Auf Ende warten und dann Soundausgabe beenden
 							Wait(1L<<sig);
-							AHI_SetSound(0, AHI_NOSOUND, 0, 0, audioctrl, NULL);
+							AHI_SetSound(0, AHI_NOSOUND, 0, 0, audioctrl, 0);
 							Wait(1L<<sig);
 
 							Close(file);

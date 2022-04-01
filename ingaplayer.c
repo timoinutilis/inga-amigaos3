@@ -3,6 +3,7 @@
 
 #include <proto/exec.h>
 #include <proto/medplayer.h>
+#include <proto/utility.h>
 
 #include <exec/exec.h>
 #include <libraries/medplayer.h>

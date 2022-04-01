@@ -578,7 +578,7 @@ ULONG LaufeINGA(ULONG ptr, BOOL *wieder) {
 		return(ptr + 2);
 	}
 	if (opc == 65) { //ExternAmigaOS.
-		Execute(peeks(ptr + 2), NULL, NULL);
+		Execute(peeks(ptr + 2), 0, 0);
 		ScreenToFront(schirm);
 		return(ptr + 6);
 	}
@@ -715,11 +715,11 @@ ULONG LaufeINGA(ULONG ptr, BOOL *wieder) {
 	}
 	if (opc == 101) { //printn.
 		*wieder = TRUE;
-		if (devmodus) printf("%d\n", peekw(ptr + 2));
+		if (devmodus) printf("%u\n", peekw(ptr + 2));
 		return(ptr + 4);
 	}
 
-	printf("PC:%ld Opc:%d\n", ptr, opc);
+	printf("PC:%lu Opc:%u\n", ptr, opc);
 	Fehler(6, "Unbekannter Skriptbefehl");	
 }
 

@@ -66,7 +66,7 @@ struct BitMap *LadeIMP(STRPTR datei) {
 	}
 	if (file) {
 		CRead(file, &imp, sizeof(struct IMP));
-		while (!(bitmap = AllocBitMap(imp.breite, imp.hoehe, 1, NULL, NULL))) {
+		while (!(bitmap = AllocBitMap(imp.breite, imp.hoehe, 1, 0, NULL))) {
 			if (!CacheAufraumen()) break;
 		}
 		if (bitmap) CRead(file, bitmap->Planes[0], imp.bytes);
@@ -120,7 +120,7 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 				if (maske == MASKE_KEINE) ibm->maske = NULL;
 				if (maske == MASKE_DATEI) ibm->maske = LadeIMP(datei);
 				if (maske == MASKE_ERSTELLEN) {
-					if ((ibm->maske = AllocBitMap(ibm->breite, ibm->hoehe, 1, NULL, NULL))) {
+					if ((ibm->maske = AllocBitMap(ibm->breite, ibm->hoehe, 1, 0, NULL))) {
 						p = (UWORD *)ibm->maske->Planes[0];
 						for (y = 0; y < ibm->hoehe; y++) {
 							b = 16; m = 0;
