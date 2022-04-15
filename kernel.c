@@ -14,6 +14,7 @@
 #include <intuition/pointerclass.h>
 #include <dos/dos.h>
 #include <graphics/gfx.h>
+#include <graphics/videocontrol.h>
 #include <diskfont/diskfont.h>
 #include <workbench/icon.h>
 #include <libraries/asl.h>
@@ -385,6 +386,7 @@ void Start() {
 	struct TextAttr textattr = {"Inga.font", 15, 0, 0};
 	ULONG disid;
 	ULONG rgb32[770];
+	ULONG vc[] = {VTAG_BORDERBLANK_SET, -1, TAG_DONE};
 	UWORD f;
 	struct DiskObject *info;
 	BOOL aktivsound = FALSE;
@@ -422,6 +424,7 @@ void Start() {
 		SA_Draggable, FALSE,
 		SA_ShowTitle, FALSE,
 		SA_Colors32, (ULONG)rgb32,
+		SA_VideoControl, (ULONG)vc,
 		TAG_DONE))) Fehler(4, "Bildschirm");
 
 	if (!(fenster = OpenWindowTags(NULL,

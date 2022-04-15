@@ -81,7 +81,7 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 	char datibm[100];
 	struct IBM *ibm = NULL;
 	struct BitMap *bitmap = NULL;
-	void *rec = NULL;
+	UBYTE *rec = NULL;
 	struct RastPort rp, temprp;
 	UWORD x, y, b, m, *q;
 	UBYTE *p;
@@ -137,10 +137,9 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 				}
 				InitRastPort(&temprp);
 				if ((temprp.BitMap = AllocBitMap(ibm->breite, 1, 8, 0, rp.BitMap))) {
-					p = rec;
 					for (y = 0; y < ibm->hoehe; y++) {
-						WritePixelLine8(&rp, 0, y, ibm->breite, p, &temprp);
-						p += ibm->bpr;
+						WritePixelLine8(&rp, 0, y, ibm->breite, rec, &temprp);
+						rec += ibm->bpr;
 					}
 					ibm->bild = bitmap;
 					FreeBitMap(temprp.BitMap);
