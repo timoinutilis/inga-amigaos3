@@ -16,7 +16,6 @@
 #include <graphics/gfx.h>
 #include <diskfont/diskfont.h>
 #include <workbench/icon.h>
-#include <cybergraphx/cybergraphics.h>
 #include <libraries/asl.h>
 #include <libraries/lowlevel.h>
 #include <devices/timer.h>
@@ -28,7 +27,6 @@
 #include <proto/graphics.h>
 #include <proto/diskfont.h>
 #include <proto/icon.h>
-#include <proto/cybergraphics.h>
 #include <proto/asl.h>
 #include <proto/lowlevel.h>
 #include <proto/timer.h>
@@ -56,7 +54,6 @@ struct MsgPort *trport = NULL;
 struct timerequest *trreq = NULL;
 BYTE trerr = -1;
 struct Device *TimerBase = NULL;
-struct Library *CyberGfxBase = NULL;
 struct Library *LowLevelBase = NULL;
 struct Window *fenster = NULL;
 struct Screen *schirm = NULL;
@@ -78,7 +75,7 @@ BOOL MausSichtbar = TRUE;
 UBYTE Taste = 0;
 
 //Programmsystemvariablen
-char *ver = "$VER: Inga-Engine Version 1.18";
+char *ver = "$VER: Inga-Engine Version 1.19";
 char prgname[257] = {0};
 extern char cddrive[10];
 extern char speicherpfad[300];
@@ -337,14 +334,20 @@ void EntwicklerAktion() {
 /*==========================Starter/Beender====================*/
 
 ULONG ScreenMode() {
-	ULONG disid;
+	ULONG monid = DEFAULT_MONITOR_ID, disid;
 	char varstr[31];
 	LONG l;
 	struct ScreenModeRequester *req;
+	struct Screen *scr;
 	ULONG keys;
 	BOOL wahl = FALSE;
 
-	disid = BestCModeIDTags(CYBRBIDTG_Depth, 8, CYBRBIDTG_NominalWidth, 640, CYBRBIDTG_NominalHeight, 480, TAG_DONE);
+	if ((scr = LockPubScreen(NULL)))
+	{
+		monid = GetVPModeID(&(scr->ViewPort)) & MONITOR_ID_MASK;
+		UnlockPubScreen(NULL, scr);
+	}
+	disid = BestModeID(BIDTAG_DIPFMustHave, DIPF_IS_DBUFFER, BIDTAG_MonitorID, monid, BIDTAG_Depth, 8, BIDTAG_NominalWidth, 640, BIDTAG_NominalHeight, 480, TAG_DONE);
 	keys = GetKey();
 	l = GetVar("IngaScreenMode", varstr, 30, GVF_GLOBAL_ONLY);
 
@@ -398,9 +401,6 @@ void Start() {
 	if (trerr)
 		Fehler(3, "timer");
 	TimerBase = trreq->tr_node.io_Device;
-
-	if (!(CyberGfxBase = OpenLibrary("cybergraphics.library", 0)))
-		Fehler(3, "cybergraphics");
 
 	if (!(LowLevelBase = OpenLibrary("lowlevel.library", 0)))
 		Fehler(3, "lowlevel");
@@ -526,7 +526,6 @@ void Ende() {
 	if (schirm) CloseScreen(schirm);
 	if (font) CloseFont(font);
 	if (gamedirlock) UnLock(gamedirlock);
-	CloseLibrary(CyberGfxBase);
 	CloseLibrary(LowLevelBase);
 	if (!trerr) CloseDevice((struct IORequest *)trreq);
 	if (trreq) DeleteIORequest((struct IORequest *)trreq);
@@ -547,7 +546,7 @@ void Fehler(UWORD num, STRPTR t) {
 		"Konnte Datei nicht öffnen",
 		"Konnte Library nicht öffnen",
 		"Konnte nicht öffnen",
-		"Konnte keinen passenden CGX-Bildschirmmodus finden",
+		"Konnte keinen passenden Bildschirmmodus finden",
 		"Fehler im Skript",
 	};
 

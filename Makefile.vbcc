@@ -1,5 +1,5 @@
 CC = vc +aos68k
-CFLAGS = -c99 -cpu=68020 -O2 -Dstricmp=Stricmp
+CFLAGS = -cpu=68020 -O2 -Dstricmp=Stricmp
 LDFLAGS =
 LIBS = -lmieee -lamiga -lauto
 
@@ -25,5 +25,5 @@ $(SOUND): $(SOUND_OBJS)
 	$(CC) $(CFLAGS) -c $*.c
 
 clean:
-	rm -f $(INGA) $(INGA_OBJS) $(SOUND) $(SOUND_OBJS)
+	-delete $(INGA) $(INGA_OBJS) $(SOUND) $(SOUND_OBJS)
 

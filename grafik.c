@@ -5,12 +5,10 @@
 #include <graphics/gfx.h>
 #include <dos/dos.h>
 #include <intuition/intuition.h>
-#include <cybergraphx/cybergraphics.h>
 #include <exec/exec.h>
 
 #include <proto/dos.h>
 #include <proto/graphics.h>
-#include <proto/cybergraphics.h>
 #include <proto/intuition.h>
 #include <proto/exec.h>
 
@@ -84,9 +82,9 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 	struct IBM *ibm = NULL;
 	struct BitMap *bitmap = NULL;
 	void *rec = NULL;
-	struct RastPort rp;
-	UWORD x, y, b, m;
-	UWORD *p;
+	struct RastPort rp, temprp;
+	UWORD x, y, b, m, *q;
+	UBYTE *p;
 
 	strcpy(datibm, "BitMaps/"); strcat(datibm, datei); strcat(datibm, ".ibm");
 
@@ -108,36 +106,45 @@ struct IBM *LadeIBM(STRPTR datei, WORD maske) {
 				globian.greifpy = 0;
 				globian.ppf = 0;
 			}
-			while (!(bitmap = AllocBitMap(ibm->breite, ibm->hoehe, 8, BMF_MINPLANES | BMF_SPECIALFMT, schirm->RastPort.BitMap))) {
+			while (!(bitmap = AllocBitMap(ibm->breite, ibm->hoehe, 8, BMF_MINPLANES, schirm->RastPort.BitMap))) {
 				if (!CacheAufraumen()) break;
 			}
 			if (bitmap) {
 				rec = CPtr(file, ibm->bpr * ibm->hoehe);
 				InitRastPort(&rp);
 				rp.BitMap = bitmap;
-				WritePixelArray(rec, 0, 0, ibm->bpr, &rp, 0, 0, ibm->breite, ibm->hoehe, RECTFMT_LUT8);
-				ibm->bild = bitmap;
 				if (maske == MASKE_KEINE) ibm->maske = NULL;
 				if (maske == MASKE_DATEI) ibm->maske = LadeIMP(datei);
 				if (maske == MASKE_ERSTELLEN) {
 					if ((ibm->maske = AllocBitMap(ibm->breite, ibm->hoehe, 1, 0, NULL))) {
-						p = (UWORD *)ibm->maske->Planes[0];
-						for (y = 0; y < ibm->hoehe; y++) {
+						p = rec; q = (UWORD *)ibm->maske->Planes[0];
+						for (y = ibm->hoehe; y > 0; y--) {
 							b = 16; m = 0;
-							for (x = 0; x < ibm->breite; x++) {
-								if (*((UBYTE *)rec + y * ibm->bpr + x)) m |= 1;
+							for (x = ibm->breite; x > 0; x--) {
+								if (*p++) m |= 1;
 								if (--b) {
 									m <<= 1;
 								} else {
-									*p++ = m; b = 16; m = 0;
+									*q++ = m; b = 16; m = 0;
 								}
 							}
 							if (b < 16) {
-								m <<= b - 1; *p++ = m;
+								m <<= b - 1; *q++ = m;
 							}
+							p += ibm->bpr - ibm->breite;
 						}
 					} else Fehler(1, datibm);
 				}
+				InitRastPort(&temprp);
+				if ((temprp.BitMap = AllocBitMap(ibm->breite, 1, 8, 0, rp.BitMap))) {
+					p = rec;
+					for (y = 0; y < ibm->hoehe; y++) {
+						WritePixelLine8(&rp, 0, y, ibm->breite, p, &temprp);
+						p += ibm->bpr;
+					}
+					ibm->bild = bitmap;
+					FreeBitMap(temprp.BitMap);
+				} else Fehler(1, datibm);
 			} else Fehler(1, datibm);
 		} else Fehler(0, datei);
 		CClose(file);
@@ -236,15 +243,15 @@ void ZeigeBild(struct IBM *ibm) {
 void LadeHintergrund(STRPTR datei) {
 	struct CACHE *file;
 	char datibm[100];
-	void *rec = NULL;
-	struct RastPort rp;
-
+	UBYTE *rec = NULL;
+	struct RastPort rp, temprp;
+	UWORD y;
 
 	strcpy(datibm, "BitMaps/"); strcat(datibm, datei); strcat(datibm, ".ibm");
 
 	if (!ort.ibm) {
 		ort.ibm = malloc(sizeof(struct IBM));
-		ort.ibm->bild = AllocBitMap(640, 480, 8, BMF_MINPLANES | BMF_SPECIALFMT, schirm->RastPort.BitMap);
+		ort.ibm->bild = AllocBitMap(640, 480, 8, BMF_MINPLANES, schirm->RastPort.BitMap);
 		ort.ibm->maske = NULL;
 	}
 
@@ -257,7 +264,14 @@ void LadeHintergrund(STRPTR datei) {
 		rec = CPtr(file, ort.ibm->bpr * ort.ibm->hoehe);
 		InitRastPort(&rp);
 		rp.BitMap = ort.ibm->bild;
-		WritePixelArray(rec, 0, 0, ort.ibm->bpr, &rp, 0, 0, ort.ibm->breite, ort.ibm->hoehe, RECTFMT_LUT8);
+		InitRastPort(&temprp);
+		if ((temprp.BitMap = AllocBitMap(ort.ibm->breite, 1, 8, 0, rp.BitMap))) {
+			for (y = 0; y < ort.ibm->hoehe; y++) {
+				WritePixelLine8(&rp, 0, y, ort.ibm->breite, rec, &temprp);
+				rec += ort.ibm->bpr;
+			}
+			FreeBitMap(temprp.BitMap);
+		}
 		
 		if (ort.ibm->maske) FreeBitMap(ort.ibm->maske);
 		ort.ibm->maske = LadeIMP(datei);

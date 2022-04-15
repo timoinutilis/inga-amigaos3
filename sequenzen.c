@@ -6,7 +6,6 @@
 #include <dos/dos.h>
 #include <intuition/intuition.h>
 #include <graphics/gfx.h>
-#include <cybergraphx/cybergraphics.h>
 #include <devices/timer.h>
 
 #include <proto/exec.h>
@@ -65,7 +64,7 @@ void Sequenz(STRPTR datei) {
 				if (*z == 0x0A) *z = 0;
 			}
 			
-			while(!(bitmap = AllocBitMap(640, 480, 8, BMF_MINPLANES | BMF_SPECIALFMT, schirm->RastPort.BitMap))) {
+			while(!(bitmap = AllocBitMap(640, 480, 8, BMF_MINPLANES, schirm->RastPort.BitMap))) {
 				if (!CacheAufraumen()) break;
 			}
 			

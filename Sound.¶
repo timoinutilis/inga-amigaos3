@@ -30,7 +30,7 @@ C/C++ Warnings
 0 0
 GCC Options (1)
 Defines (End)
-1 0 0 1 0
+1 0 0 0 0
 1 0 0 1 1 1 0
 0 2 1 0 0
 0 0 0 0 1 0 0
@@ -83,7 +83,6 @@ Section
 7
 File
 10 "IngaSound"
-"IngaSound"
 Storm Shell Project (Dependencies)
 "" ""
 ""
